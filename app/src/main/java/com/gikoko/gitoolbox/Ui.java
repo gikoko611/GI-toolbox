@@ -23,19 +23,22 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 /**
- * Ui v3.0 - "Nebula Green" theme engine: gradient surfaces, 3D elevation shadows,
- * ripple touches, entrance animations, Padauk typography. 100% programmatic.
+ * Ui v0.0.1 - "CYBER 3D" theme engine: neon cyan/magenta flashes over deep navy,
+ * gradient surfaces, 3D elevation shadows, ripple touches, flash-fast entrance
+ * animations, Padauk typography. 100% programmatic.
  */
 public final class Ui {
 
-    public static final int BG = Color.parseColor("#04150E");
-    public static final int BG2 = Color.parseColor("#0A241A");
-    public static final int CARD = Color.parseColor("#0B2117");
+    public static final int BG = Color.parseColor("#02060E");
+    public static final int BG2 = Color.parseColor("#04101F");
+    public static final int CARD = Color.parseColor("#0A1626");
     public static final int GREEN = Color.parseColor("#00FF9D");
+    public static final int CYAN = Color.parseColor("#00E5FF");
+    public static final int MAGENTA = Color.parseColor("#FF2E88");
     public static final int GOLD = Color.parseColor("#FFD700");
-    public static final int TEXT = Color.parseColor("#EAFFF4");
-    public static final int DIM = Color.parseColor("#3F8A6B");
-    public static final int EDGE = Color.parseColor("#1F5540");
+    public static final int TEXT = Color.parseColor("#EAF6FF");
+    public static final int DIM = Color.parseColor("#5C8FAE");
+    public static final int EDGE = Color.parseColor("#17435F");
     public static final int RED = Color.parseColor("#FF6B6B");
 
     private Ui() {
@@ -99,24 +102,26 @@ public final class Ui {
         return g;
     }
 
-    /** Vertical gradient surface with hairline stroke - the v3 card look. */
+    /** Vertical gradient surface with hairline stroke - the v0.0.1 cyber card look. */
     public static GradientDrawable surface(Context c) {
         GradientDrawable g = new GradientDrawable();
         g.setOrientation(GradientDrawable.Orientation.TL_BR);
-        g.setColors(new int[]{Color.parseColor("#0D2A1D"), Color.parseColor("#081C13")});
+        g.setColors(new int[]{Color.parseColor("#0E2036"), Color.parseColor("#081527")});
         g.setCornerRadius(dp(c, 16));
         g.setStroke(Math.max(1, dp(c, 1)), EDGE);
         return g;
     }
 
-    /** Glassy gradient button surface with gold/green stroke. */
+    /** Glassy gradient button surface with neon stroke. */
     public static GradientDrawable buttonSurface(Context c, int accent) {
         GradientDrawable g = new GradientDrawable();
         g.setOrientation(GradientDrawable.Orientation.TL_BR);
-        g.setColors(new int[]{Color.parseColor("#103526"), Color.parseColor("#071F15")});
+        g.setColors(new int[]{Color.parseColor("#12314F"), Color.parseColor("#07182B")});
         g.setCornerRadius(dp(c, 12));
         g.setStroke(Math.max(1, dp(c, 1)),
-                accent == GOLD ? Color.parseColor("#8A7420") : Color.parseColor("#1F6C4E"));
+                accent == GOLD ? Color.parseColor("#8A7420")
+                        : accent == MAGENTA ? Color.parseColor("#8C1F52")
+                        : Color.parseColor("#1E6E8C"));
         return g;
     }
 
@@ -149,7 +154,7 @@ public final class Ui {
         b.setTypeface(fontFor(true, c));
         b.setTextSize(13);
         b.setLetterSpacing(0.06f);
-        b.setBackground(ripple(0x3300FF9D, buttonSurface(c, color)));
+        b.setBackground(ripple(0x3300E5FF, buttonSurface(c, color)));
         b.setElevation(dp(c, 4));
         b.setPadding(dp(c, 16), dp(c, 12), dp(c, 16), dp(c, 12));
         return b;
@@ -166,8 +171,8 @@ public final class Ui {
         e.setTextColor(TEXT);
         e.setTextSize(14);
         e.setTypeface(fontFor(false, c));
-        e.setBackground(ripple(0x1A00FF9D, roundStroke(Color.parseColor("#071B12"),
-                Color.parseColor("#265F47"), 12, c)));
+        e.setBackground(ripple(0x1A00E5FF, roundStroke(Color.parseColor("#071526"),
+                Color.parseColor("#1E5570"), 12, c)));
         e.setPadding(dp(c, 14), dp(c, 12), dp(c, 14), dp(c, 12));
         e.setSingleLine(!multiline);
         if (multiline) {
@@ -209,7 +214,7 @@ public final class Ui {
         root.setOrientation(LinearLayout.VERTICAL);
         GradientDrawable g = new GradientDrawable();
         g.setOrientation(GradientDrawable.Orientation.TOP_BOTTOM);
-        g.setColors(new int[]{Color.parseColor("#062018"), Color.parseColor("#04150E"), Color.parseColor("#020C08")});
+        g.setColors(new int[]{Color.parseColor("#0A1E38"), Color.parseColor("#030B18"), Color.parseColor("#02060E")});
         root.setBackground(g);
         int p = dp(c, 14);
         root.setPadding(p, dp(c, 16), p, p);
@@ -242,18 +247,18 @@ public final class Ui {
     public static TextView badge(Context c, String s, int color) {
         TextView t = text(c, s, 10, color, true);
         t.setLetterSpacing(0.12f);
-        t.setBackground(roundStroke(Color.parseColor("#06140D"), color, 99, c));
+        t.setBackground(roundStroke(Color.parseColor("#03101C"), color, 99, c));
         t.setPadding(dp(c, 10), dp(c, 4), dp(c, 10), dp(c, 4));
         return t;
     }
 
-    /** Entrance reveal: fade + rise. delayMs staggers lists. */
+    /** Entrance reveal: fade + rise. Flash-fast for the cyber feel. */
     public static void reveal(View v, long delayMs) {
         AnimationSet set = new AnimationSet(true);
         AlphaAnimation a = new AlphaAnimation(0f, 1f);
-        a.setDuration(360);
-        TranslateAnimation tr = new TranslateAnimation(0, 0, dp(v.getContext(), 26), 0);
-        tr.setDuration(380);
+        a.setDuration(180);
+        TranslateAnimation tr = new TranslateAnimation(0, 0, dp(v.getContext(), 20), 0);
+        tr.setDuration(200);
         set.addAnimation(a);
         set.addAnimation(tr);
         set.setStartOffset(delayMs);
@@ -280,6 +285,15 @@ public final class Ui {
         s.setRepeatCount(Animation.INFINITE);
         s.setRepeatMode(Animation.REVERSE);
         v.startAnimation(s);
+    }
+
+    /** Cyber flash: two rapid neon blinks (alerts, results, transitions). */
+    public static void flash(View v) {
+        AlphaAnimation a = new AlphaAnimation(1f, 0.25f);
+        a.setDuration(90);
+        a.setRepeatCount(2);
+        a.setRepeatMode(Animation.REVERSE);
+        v.startAnimation(a);
     }
 
     /** Horizontal thin divider line. */

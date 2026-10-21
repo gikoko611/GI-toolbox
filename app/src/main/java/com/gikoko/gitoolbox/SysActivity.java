@@ -91,6 +91,9 @@ public class SysActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         h.removeCallbacksAndMessages(null);
+        sosOn = false;
+        dbRunning = false;
+        torch(false);
     }
 
     void toast(final String s) {
@@ -139,6 +142,11 @@ public class SysActivity extends Activity {
         else if (tool.equals("Uptime")) uptime();
         else if (tool.equals("Kernel Info")) kernelInfo();
         else if (tool.equals("Storage Volumes")) storageVolumes();
+        else if (tool.equals("Bluetooth Checker")) bluetoothChecker();
+        else if (tool.equals("NFC Checker")) nfcChecker();
+        else if (tool.equals("WiFi Signal Meter")) wifiSignalMeter();
+        else if (tool.equals("Flashlight SOS")) flashlightSOS();
+        else if (tool.equals("Decibel Alarm")) decibelAlarm();
         else infoCard(tool, "Module loading…");
     }
 
@@ -1495,6 +1503,419 @@ public class SysActivity extends Activity {
         } catch (Exception e) {
             sb.append("Path: ").append(dir.getAbsolutePath()).append("\nUnavailable\n");
         }
+    }
+
+    // ---------------------------------------------------------------- v0.0.1 WiFi & Comm device tools
+
+    private volatile boolean sosOn = false;
+    private Thread sosThread;
+    private volatile boolean dbRunning = false;
+    private Thread dbThread;
+
+    void bluetoothChecker() {
+        LinearLayout c = Ui.card(this);
+        c.addView(Ui.text(this, "HARDWARE RADIO CHECK — BLUETOOTH", 11, Ui.DIM, true));
+        final TextView st = Ui.text(this, "Checking…", 13, Ui.TEXT, true);
+        c.addView(st);
+        out.addView(c);
+        Ui.reveal(c);
+        final android.bluetooth.BluetoothAdapter ba;
+        try {
+            ba = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
+        } catch (Exception e) {
+            ba = null;
+        }
+        if (ba == null) {
+            st.setText("NO BLUETOOTH — this device has no Bluetooth radio.");
+            st.setTextColor(Ui.RED);
+            return;
+        }
+        String state;
+        try {
+            state = ba.isEnabled() ? "ON" : "OFF";
+        } catch (Exception e) {
+            state = "UNKNOWN (permission needed)";
+        }
+        String name = "hidden";
+        try {
+            name = ba.getName() == null ? "(unnamed)" : ba.getName();
+        } catch (Exception ignored) {
+        }
+        String scan = "unknown";
+        try {
+            int sm = ba.getScanMode();
+            scan = sm == android.bluetooth.BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE
+                    ? "DISCOVERABLE" : "DISCOVERABLE OFF (connectable only)";
+        } catch (Exception ignored) {
+        }
+        st.setText("STATE: " + state + "\nNAME: " + name + "\nSCAN MODE: " + scan);
+        st.setTextColor(state.equals("ON") ? Ui.GREEN : Ui.GOLD);
+
+        LinearLayout r = Ui.row(this);
+        Button on = Ui.button(this, "▶ TURN ON", Ui.GREEN);
+        on.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    toast(ba.enable() ? "Bluetooth turning on…" : "Bluetooth ON denied");
+                } catch (Exception e) {
+                    toast("Needs Bluetooth permission (Android 12+)");
+                }
+            }
+        });
+        LinearLayout.LayoutParams ol = new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        on.setLayoutParams(ol);
+        r.addView(on);
+        Button off = Ui.button(this, "■ TURN OFF", Ui.RED);
+        off.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    ba.disable();
+                    toast("Bluetooth turning off");
+                } catch (Exception e) {
+                    toast("Needs Bluetooth permission (Android 12+)");
+                }
+            }
+        });
+        LinearLayout.LayoutParams fl = new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        fl.leftMargin = Ui.dp(this, 8);
+        off.setLayoutParams(fl);
+        r.addView(off);
+        LinearLayout.LayoutParams rl = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        rl.topMargin = Ui.dp(this, 8);
+        r.setLayoutParams(rl);
+        out.addView(r);
+        infoCard("ABOUT THIS CHECK",
+                "Reads the device Bluetooth radio state. On Android 12+ reading the adapter name "
+                        + "and switching Bluetooth requires the Nearby-devices permission — if the state "
+                        + "shows UNKNOWN, grant permission from system settings.");
+    }
+
+    void nfcChecker() {
+        LinearLayout c = Ui.card(this);
+        c.addView(Ui.text(this, "HARDWARE RADIO CHECK — NFC", 11, Ui.DIM, true));
+        final TextView st = Ui.text(this, "Checking…", 13, Ui.TEXT, true);
+        c.addView(st);
+        out.addView(c);
+        Ui.reveal(c);
+        boolean has;
+        try {
+            has = android.nfc.NfcAdapter.getDefaultAdapter(this) != null;
+        } catch (Exception e) {
+            has = false;
+        }
+        if (has) {
+            boolean en = false;
+            try {
+                en = android.nfc.NfcAdapter.getDefaultAdapter(this).isEnabled();
+            } catch (Exception ignored) {
+            }
+            st.setText("NFC PRESENT — " + (en ? "ENABLED ✓" : "DISABLED (turn on in settings)"));
+            st.setTextColor(en ? Ui.GREEN : Ui.GOLD);
+        } else {
+            st.setText("NO NFC — this device has no NFC chip. Tap-to-pay and tag reading are not supported.");
+            st.setTextColor(Ui.RED);
+        }
+        infoCard("ABOUT NFC",
+                "Near-Field Communication is used for contactless payments, bus cards, and reading "
+                        + "/ writing NTAG stickers. If NFC is present, enable it in Settings → Connected "
+                        + "devices → NFC, then hold a card or tag near the back of the phone.");
+    }
+
+    void wifiSignalMeter() {
+        LinearLayout c = Ui.card(this);
+        c.addView(Ui.text(this, "LIVE WI-FI SIGNAL · REFRESH 1s", 11, Ui.DIM, true));
+        final TextView st = Ui.text(this, "Reading…", 13, Ui.CYAN, true);
+        st.setTag("sig");
+        c.addView(st);
+        final TextView bar = Ui.text(this, "▁▁▁▁▁", 20, Ui.GREEN, false);
+        bar.setTag("bar");
+        c.addView(bar);
+        out.addView(c);
+        Ui.reveal(c);
+
+        final Runnable tick = new Runnable() {
+            @Override
+            public void run() {
+                String s;
+                int lvl = 0;
+                try {
+                    android.net.wifi.WifiManager wm = (android.net.wifi.WifiManager)
+                            getApplicationContext().getSystemService(WIFI_SERVICE);
+                    android.net.wifi.WifiInfo wi = wm.getConnectionInfo();
+                    int rssi = wi.getRssi();
+                    lvl = android.net.wifi.WifiManager.calculateSignalLevel(rssi, 6);
+                    String ssid = wi.getSSID() == null ? "?" : wi.getSSID().replace("\"", "");
+                    int ch;
+                    if (wi.getFrequency() > 5000) ch = (wi.getFrequency() - 5000) / 5;
+                    else ch = (wi.getFrequency() - 2407) / 5;
+                    String qual = lvl >= 4 ? "EXCELLENT" : lvl == 3 ? "GOOD" : lvl == 2 ? "FAIR" : "WEAK";
+                    s = "SSID: " + (ssid.length() == 0 || ssid.equals("<unknown ssid>") ? "hidden/not permitted" : ssid)
+                            + "\nRSSI: " + rssi + " dBm · " + qual
+                            + "\nLINK SPEED: " + wi.getLinkSpeed() + " Mbps"
+                            + "\nBAND: " + (wi.getFrequency() > 5000 ? "5 GHz" : "2.4 GHz") + " · CHANNEL " + ch;
+                } catch (Exception e) {
+                    s = "Wi-Fi not connected or not permitted";
+                }
+                TextView t = (TextView) out.findViewWithTag("sig");
+                if (t != null) t.setText(s);
+                TextView b = (TextView) out.findViewWithTag("bar");
+                if (b != null) {
+                    int n = Math.max(0, Math.min(5, lvl));
+                    StringBuilder sb = new StringBuilder();
+                    String[] blocks = {"▁", "▂", "▃", "▅", "▇", "▇"};
+                    for (int i = 0; i < 5; i++) sb.append(i < n ? blocks[i + 1] : "▁");
+                    b.setText(sb.toString());
+                    b.setTextColor(n >= 4 ? Ui.GREEN : n >= 2 ? Ui.GOLD : Ui.RED);
+                    if (n > 0) Ui.flash(b);
+                }
+                if (!isFinishing()) h.postDelayed(this, 1000);
+            }
+        };
+        h.postDelayed(tick, 100);
+        infoCard("ABOUT THIS METER",
+                "RSSI closer to 0 dBm is stronger: -50 excellent, -60 good, -70 fair, below -80 weak. "
+                        + "SSID may show hidden unless Location is on (Android privacy rule). Walk around "
+                        + "your home to find the best signal spots before placing a Wi-Fi camera or phone.");
+    }
+
+    void flashlightSOS() {
+        infoCard("EMERGENCY BEACON",
+                "Tap START — the torch blinks the international SOS pattern: 3 short · 3 long · 3 short "
+                        + "(··· −−− ···), repeating until you stop it. Visible from hundreds of meters at "
+                        + "night. Keep the screen facing down to save battery.");
+        Button go = Ui.button(this, "🆘 START SOS BEACON", Ui.RED);
+        go.setTag("sos");
+        go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sosOn) {
+                    sosOn = false;
+                    toast("SOS stopped");
+                    Button b = (Button) out.findViewWithTag("sos");
+                    if (b != null) b.setText("🆘 START SOS BEACON");
+                    return;
+                }
+                sosOn = true;
+                toast("SOS beacon running");
+                Button b = (Button) out.findViewWithTag("sos");
+                if (b != null) b.setText("■ STOP SOS BEACON");
+                sosThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        int[] seq = {200, 200, 200, 600, 600, 600, 200, 200, 200};
+                        while (sosOn) {
+                            for (int i = 0; i < seq.length && sosOn; i++) {
+                                torch(true);
+                                sleepQuit(seq[i]);
+                                torch(false);
+                                sleepQuit(200);
+                                if (i == 2 || i == 5) sleepQuit(400); // letter gap
+                            }
+                            for (int w = 0; w < 7 && sosOn; w++) sleepQuit(200); // word gap
+                        }
+                        torch(false);
+                    }
+                });
+                sosThread.start();
+            }
+        });
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.topMargin = Ui.dp(this, 8);
+        go.setLayoutParams(lp);
+        out.addView(go);
+    }
+
+    void sleepQuit(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (Exception ignored) {
+        }
+    }
+
+    void torch(boolean on) {
+        try {
+            android.hardware.camera2.CameraManager cm = (android.hardware.camera2.CameraManager)
+                    getSystemService(CAMERA_SERVICE);
+            for (String id : cm.getCameraIdList()) {
+                if (cm.getCameraCharacteristics(id).get(
+                        android.hardware.camera2.CameraCharacteristics.FLASH_INFO_AVAILABLE)) {
+                    cm.setTorchMode(id, on);
+                    break;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    void decibelAlarm() {
+        infoCard("NOISE TRIP-WIRE",
+                "Set a threshold, ARM it, and leave the phone — the moment surrounding noise passes "
+                        + "the line it fires a loud alarm tone, torch flash and vibration. Use it as a "
+                        + "door/baby-room/quiet-zone alarm.");
+        LinearLayout c = Ui.card(this);
+        final int[] thr = {70};
+        final TextView tl = Ui.text(this, "THRESHOLD 70 dB", 12, Ui.GOLD, true);
+        tl.setTag("thr");
+        SeekBar sb = new SeekBar(this);
+        sb.setMax(60); // 40..100
+        sb.setProgress(30);
+        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar s, int p, boolean u) {
+                thr[0] = p + 40;
+                TextView t = (TextView) out.findViewWithTag("thr");
+                if (t != null) t.setText("THRESHOLD " + thr[0] + " dB");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar s) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar s) {
+            }
+        });
+        LinearLayout.LayoutParams cl = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        cl.topMargin = Ui.dp(this, 8);
+        c.setLayoutParams(cl);
+        c.addView(tl);
+        c.addView(sb);
+        out.addView(c);
+
+        LinearLayout live = Ui.card(this);
+        live.addView(Ui.text(this, "LIVE LEVEL", 10, Ui.DIM, true));
+        final TextView lv = Ui.text(this, "— dB", 26, Ui.CYAN, true);
+        lv.setTag("db");
+        live.addView(lv);
+        out.addView(live);
+        Ui.pop(live);
+
+        Button arm = Ui.button(this, "🛡 ARM ALARM", Ui.GREEN);
+        arm.setTag("arm");
+        arm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dbRunning) {
+                    dbRunning = false;
+                    toast("Disarmed");
+                    Button b = (Button) out.findViewWithTag("arm");
+                    if (b != null) b.setText("🛡 ARM ALARM");
+                    return;
+                }
+                if (checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{android.Manifest.permission.RECORD_AUDIO}, 13);
+                    toast("Grant mic permission, then tap ARM again");
+                    return;
+                }
+                startDbWatch(thr[0]);
+            }
+        });
+        LinearLayout.LayoutParams al = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        al.topMargin = Ui.dp(this, 8);
+        arm.setLayoutParams(al);
+        out.addView(arm);
+    }
+
+    void startDbWatch(final int threshold) {
+        dbRunning = true;
+        Button b = (Button) out.findViewWithTag("arm");
+        if (b != null) b.setText("■ DISARM");
+        toast("Armed at " + threshold + " dB");
+        dbThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                android.media.AudioRecord rec = null;
+                try {
+                    int sr = 16000;
+                    int min = android.media.AudioRecord.getMinBufferSize(sr,
+                            android.media.AudioFormat.CHANNEL_IN_MONO,
+                            android.media.AudioFormat.ENCODING_PCM_16BIT);
+                    rec = new android.media.AudioRecord(android.media.MediaRecorder.AudioSource.MIC,
+                            sr, android.media.AudioFormat.CHANNEL_IN_MONO,
+                            android.media.AudioFormat.ENCODING_PCM_16BIT, Math.max(min, 4096));
+                    rec.startRecording();
+                    short[] buf = new short[1024];
+                    long lastTrig = 0;
+                    while (dbRunning) {
+                        int n = rec.read(buf, 0, buf.length);
+                        if (n <= 0) continue;
+                        double sum = 0;
+                        for (int i = 0; i < n; i++) sum += buf[i] * buf[i];
+                        double rms = Math.sqrt(sum / n);
+                        final double db = Math.max(0, 20 * Math.log10(Math.max(rms, 0.5)));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                TextView t = (TextView) out.findViewWithTag("db");
+                                if (t != null) {
+                                    t.setText(String.format(Locale.US, "%.0f dB", db));
+                                    t.setTextColor(db > threshold ? Ui.RED : Ui.CYAN);
+                                }
+                            }
+                        });
+                        if (db > threshold && System.currentTimeMillis() - lastTrig > 5000) {
+                            lastTrig = System.currentTimeMillis();
+                            triggerAlarm();
+                        }
+                        Thread.sleep(150);
+                    }
+                    rec.stop();
+                } catch (Exception e) {
+                    toast("Mic error: " + e.getClass().getSimpleName());
+                } finally {
+                    try {
+                        if (rec != null) rec.release();
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        });
+        dbThread.start();
+    }
+
+    void triggerAlarm() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                toast("⚠ NOISE TRIP-WIRE TRIGGERED");
+            }
+        });
+        try {
+            android.media.ToneGenerator tg = new android.media.ToneGenerator(
+                    AudioManager.STREAM_ALARM, 100);
+            tg.startTone(android.media.ToneGenerator.TONE_CDMA_ABBR_ALERT, 3000);
+        } catch (Exception ignored) {
+        }
+        try {
+            android.os.Vibrator vv = (android.os.Vibrator) getSystemService(VIBRATOR_SERVICE);
+            if (android.os.Build.VERSION.SDK_INT >= 26) {
+                vv.vibrate(android.os.VibrationEffect.createWaveform(
+                        new long[]{0, 400, 200, 400, 200, 400}, -1));
+            } else {
+                vv.vibrate(1000);
+            }
+        } catch (Exception ignored) {
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 6; i++) {
+                    torch(true);
+                    sleepQuit(200);
+                    torch(false);
+                    sleepQuit(200);
+                }
+            }
+        }).start();
     }
 
     void infoCard(String title, String body) {
