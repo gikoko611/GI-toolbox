@@ -259,7 +259,7 @@ final class ComputeText {
                 for (int i = 0; i < a.length(); i++) {
                     JSONObject o = a.getJSONObject(i);
                     for (int j = 0; j < keys.length(); j++) {
-                        sb.append(o.opt(keys.getString(j), "")).append(j == keys.length() - 1 ? "" : ",");
+                        sb.append(o.optString(keys.getString(j), "")).append(j == keys.length() - 1 ? "" : ",");
                     }
                     sb.append('\n');
                 }

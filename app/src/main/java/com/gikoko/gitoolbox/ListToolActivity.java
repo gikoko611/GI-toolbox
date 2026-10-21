@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -200,7 +201,7 @@ public class ListToolActivity extends Activity {
     void setupSecure(LinearLayout root) {
         final boolean hasPin = prefs.getString("secure_pin", "").length() > 0;
         final EditText pin = Ui.input(this, hasPin ? "Enter your PIN" : "Set a new PIN (digits)", false);
-        pin.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_CLASS_TEXT_VARIATION_PASSWORD);
+        pin.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
         root.addView(pin);
         Button go = Ui.button(this, hasPin ? "🔓 UNLOCK" : "🔑 SET PIN");
         go.setOnClickListener(new View.OnClickListener() {

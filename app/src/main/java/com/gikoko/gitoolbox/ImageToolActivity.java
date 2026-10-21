@@ -782,11 +782,11 @@ public class ImageToolActivity extends Activity {
             public void onClick(View v) {
                 if (picked == null) { toast("Pick an image first"); return; }
                 resultCard.removeAllViews();
-                resultCard.addView(Ui.text(this, "Palette", 15, Ui.GOLD, true));
+                resultCard.addView(Ui.text(ImageToolActivity.this, "Palette", 15, Ui.GOLD, true));
                 List<Integer> colors = palette(picked);
                 for (int i = 0; i < colors.size(); i++) {
                     int col = colors.get(i);
-                    LinearLayout r = Ui.row(this);
+                    LinearLayout r = Ui.row(ImageToolActivity.this);
                     r.setGravity(Gravity.CENTER_VERTICAL);
                     View sw = new View(ImageToolActivity.this);
                     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(Ui.dp(ImageToolActivity.this, 46), Ui.dp(ImageToolActivity.this, 46));
@@ -925,7 +925,7 @@ public class ImageToolActivity extends Activity {
                 }
                 toast("Saved " + saved + " pieces to Pictures/GIToolbox");
                 resultCard.removeAllViews();
-                resultCard.addView(Ui.text(this, "Saved " + saved + " images to Pictures/GIToolbox", 14, Ui.GREEN, true));
+                resultCard.addView(Ui.text(ImageToolActivity.this, "Saved " + saved + " images to Pictures/GIToolbox", 14, Ui.GREEN, true));
                 box.addView(resultCard);
             }
         });

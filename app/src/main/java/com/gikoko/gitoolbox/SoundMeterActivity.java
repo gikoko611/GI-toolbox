@@ -7,7 +7,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -56,9 +55,9 @@ public class SoundMeterActivity extends Activity {
 
     void startMeter() {
         if (running) return;
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, 2);
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, 2);
             hint.setText("Microphone permission needed. Tap START again after allowing.");
             return;
         }
