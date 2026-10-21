@@ -77,7 +77,7 @@ public class MyanmarCalendarActivity extends Activity {
 
     void calendarMain() {
         intro("Live Myanmar lunar calendar. Today is shown first — tap CHOOSE DATE to check "
-                "any date: Burmese weekday, Myanmar Era year, month, lunar day and moon phase.");
+                + "any date: Burmese weekday, Myanmar Era year, month, lunar day and moon phase.");
 
         LocalDate today = LocalDate.now();
         showDateCard(today, "TODAY");
