@@ -1,6 +1,6 @@
 package com.gikoko.gitoolbox;
 
-/** The 12 x 25 = 300 tool catalog. */
+/** The 14 x 25 = 350 tool catalog. */
 public final class Catalog {
 
     public static final String[][] CATS = {
@@ -17,6 +17,7 @@ public final class Catalog {
             {"Utility & Daily", "\uD83D\uDEE0", "Flashlight Torch", "Mirror Camera", "Ruler", "Protractor", "Bubble Level", "Speedometer", "Clinometer", "Alarm Clock", "Stopwatch", "Timer", "Pomodoro Timer", "World Clock", "Countdown", "Calendar", "Habit Tracker", "Quick Notes", "To-Do List", "Reminder", "Dice Roller", "Coin Flip", "Random Picker", "Decision Wheel", "Countdown Days", "Name Picker", "Price Compare"},
             {"AI Tools", "\uD83E\uDD16", "Text Summarizer", "Text Translator", "Grammar Fixer", "Paraphraser", "AI Writer", "Code Explainer", "Code Generator", "Regex Explainer", "Regex Builder", "Text to Emoji", "Tone Analyzer", "Keyword Extractor", "Name Generator", "Bio Generator", "Email Writer", "Poem Writer", "Story Writer", "Quote Maker", "Slogan Maker", "Resume Builder", "Blog Outline", "Product Description", "Study Notes Maker", "Flashcard Maker", "Idea Brainstorm"},
             {"System Pro", "\uD83D\uDD27", "App Manager", "APK Extractor", "App Uninstaller", "App Sizes", "Exported Checker", "Task Manager", "RAM Boost", "Cache Cleaner", "Permission Manager", "Startup Manager", "Data Usage", "Network Monitor", "Clipboard Manager", "Keep Screen On", "Volume Manager", "Sound Profile", "Ringtone Picker", "Refresh Rate", "WebView Version", "Keyboard List", "TTS Engines", "Accessibility Checker", "Uptime", "Kernel Info", "Storage Volumes"},
+            {"WiFi & Comm", "\uD83D\uDCF6", "WiFi Call", "Walkie-Talkie", "Phone Control (LAN)", "Find My Phone", "CCTV Camera", "LAN Chat", "LAN Clipboard Sync", "Battery Remote", "Sound Generator", "Tone Generator", "Ultrasonic Generator", "Hearing Test", "Morse Flasher", "Flashlight SOS", "Alarm Siren", "White Noise", "Decibel Alarm", "Text to Speech", "Stop Motion Studio", "Myanmar Calendar", "Myanmar Numerals", "Age (Myanmar)", "Bluetooth Checker", "NFC Checker", "WiFi Signal Meter"},
     };
 
     private Catalog() {

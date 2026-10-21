@@ -108,6 +108,22 @@ public final class Router {
                 || t.equals("Accessibility Checker") || t.equals("Uptime") || t.equals("Kernel Info")
                 || t.equals("Storage Volumes"))
             return SysActivity.class;
+        // WiFi & Comm (v0.0.1)
+        if (t.equals("WiFi Call") || t.equals("Walkie-Talkie") || t.equals("Phone Control (LAN)")
+                || t.equals("Find My Phone") || t.equals("LAN Chat") || t.equals("LAN Clipboard Sync")
+                || t.equals("Battery Remote"))
+            return WifiCommActivity.class;
+        if (t.equals("Sound Generator") || t.equals("Tone Generator") || t.equals("Ultrasonic Generator")
+                || t.equals("Hearing Test") || t.equals("Morse Flasher") || t.equals("Alarm Siren")
+                || t.equals("White Noise") || t.equals("Text to Speech"))
+            return MediaLabActivity.class;
+        if (t.equals("CCTV Camera") || t.equals("Stop Motion Studio"))
+            return CameraLabActivity.class;
+        if (t.equals("Myanmar Calendar") || t.equals("Myanmar Numerals") || t.equals("Age (Myanmar)"))
+            return MyanmarCalendarActivity.class;
+        if (t.equals("Flashlight SOS") || t.equals("Decibel Alarm") || t.equals("Bluetooth Checker")
+                || t.equals("NFC Checker") || t.equals("WiFi Signal Meter"))
+            return SysActivity.class;
         return null;
     }
 

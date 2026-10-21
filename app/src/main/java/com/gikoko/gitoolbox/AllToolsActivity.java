@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-/** All 300 tools with live search. */
+/** All 350 tools with live search — each tool with its own 3D icon. */
 public class AllToolsActivity extends Activity {
 
     private LinearLayout list;
@@ -25,7 +27,11 @@ public class AllToolsActivity extends Activity {
                 finish();
             }
         }));
-        search = Ui.input(this, "Search 325 tools...", false);
+        LinearLayout br = Ui.row(this);
+        br.addView(Ui.badge(this, "● 350 CYBER TOOLS", Ui.CYAN));
+        root.addView(br);
+        Ui.reveal(br);
+        search = Ui.input(this, "Search 350 tools...", false);
         search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int a, int c, int d) {
@@ -63,6 +69,7 @@ public class AllToolsActivity extends Activity {
                     list.addView(h);
                     catShown = true;
                 }
+                final int cI = c;
                 LinearLayout item = Ui.card(this);
                 item.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -70,7 +77,21 @@ public class AllToolsActivity extends Activity {
                         Router.open(AllToolsActivity.this, name);
                     }
                 });
-                item.addView(Ui.text(this, name, 13, Ui.TEXT, true));
+                LinearLayout top = Ui.row(this);
+                top.setGravity(Gravity.CENTER_VERTICAL);
+                ImageView icon = new ImageView(this);
+                icon.setImageDrawable(Icon3D.tile(this, name, cI));
+                LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(
+                        Ui.dp(this, 40), Ui.dp(this, 40));
+                icon.setLayoutParams(ilp);
+                top.addView(icon);
+                TextView n = Ui.text(this, name, 13, Ui.TEXT, true);
+                LinearLayout.LayoutParams nlp = new LinearLayout.LayoutParams(0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+                nlp.leftMargin = Ui.dp(this, 12);
+                n.setLayoutParams(nlp);
+                top.addView(n);
+                item.addView(top);
                 LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 lp.topMargin = Ui.dp(this, 6);
