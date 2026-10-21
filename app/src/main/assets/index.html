@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#04150E">
+<title>GIToolbox</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:'Segoe UI',system-ui,Arial,sans-serif}
+html,body{height:100%;overflow:hidden;background:#04150E;color:#eafff4}
+button,input,select,textarea{outline:none}
+#bg{position:fixed;inset:0;background:radial-gradient(ellipse at 50% -20%,#0a2e1c 0%,#051510 40%,#020a06 100%);z-index:0}
+#grid{position:absolute;bottom:-18%;left:-30%;width:160%;height:62%;background:linear-gradient(rgba(0,255,150,.20) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,150,.20) 1px,transparent 1px);background-size:44px 44px;transform:perspective(420px) rotateX(62deg);animation:gm 3s linear infinite;-webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.9),transparent 75%);mask-image:linear-gradient(to top,rgba(0,0,0,.9),transparent 75%)}
+@keyframes gm{from{background-position:0 0}to{background-position:0 44px}}
+.orb{position:absolute;border-radius:50%;filter:blur(50px);opacity:.28;animation:of 12s ease-in-out infinite alternate}
+#orb1{width:260px;height:260px;background:#00ff88;top:-70px;left:-60px}
+#orb2{width:200px;height:200px;background:#ffd700;bottom:-40px;right:-50px;animation-delay:-5s}
+@keyframes of{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,26px) scale(1.15)}}
+#scan{position:fixed;inset:0;z-index:60;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.13) 0 1px,transparent 1px 3px)}
+.pt{position:absolute;border-radius:50%;animation:fl linear infinite;pointer-events:none;opacity:0}
+@keyframes fl{0%{transform:translateY(0);opacity:0}12%{opacity:.85}85%{opacity:.5}100%{transform:translateY(-140px);opacity:0}}
+#splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s}
+#splash.hide{opacity:0;pointer-events:none}
+.neon{color:#eafff4;text-shadow:0 0 6px rgba(0,255,150,.8),0 0 18px rgba(0,255,150,.4)}
+.gold{color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,.7),0 0 18px rgba(255,180,0,.35)}
+#page{position:fixed;top:0;bottom:56px;left:0;right:0;z-index:10;overflow-y:auto;padding:26px 14px 20px;-webkit-overflow-scrolling:touch}
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:50;display:flex;background:rgba(2,16,10,.96);border-top:1px solid rgba(0,255,157,.25)}
+#nav button{flex:1;background:none;border:none;color:#3f8a6b;padding:8px 0 6px;font-size:9px;letter-spacing:.2em;text-transform:uppercase}
+#nav button.act{color:#00ff9d}
+#nav button b{display:block;font-size:17px;margin-bottom:2px}
+.hdr{display:flex;align-items:center;gap:10px}
+h1{font-size:20px;letter-spacing:.06em;font-weight:900}
+.sub{font-size:9px;letter-spacing:.24em;color:#8affd0;text-transform:uppercase}
+.ver{font-size:9px;font-weight:700;color:#ffd700;border:1px solid rgba(255,215,0,.5);background:rgba(255,215,0,.08);padding:3px 8px;border-radius:99px}
+.srch{display:flex;align-items:center;gap:8px;margin-top:12px;border:1px solid rgba(0,255,157,.3);background:rgba(3,21,14,.85);border-radius:12px;padding:10px 12px}
+.srch input{flex:1;background:none;border:none;color:#eafff4;font-size:13px}
+.banner{margin-top:10px;border:1px solid rgba(255,215,0,.4);border-radius:12px;padding:10px 12px;background:linear-gradient(120deg,rgba(255,215,0,.10),rgba(0,255,150,.08))}
+.secl{margin:16px 0 8px;font-size:9px;letter-spacing:.3em;color:#3f8a6b;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cat{border:1px solid rgba(0,255,157,.25);background:rgba(4,21,14,.92);border-radius:12px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.cat:active{transform:scale(.95)}
+.cat span.e{font-size:24px}
+.cat span.n{font-size:11px;font-weight:700;margin-top:4px;line-height:1.15}
+.cat span.c{margin-top:5px;font-size:8px;color:#ffd700;border:1px solid rgba(255,215,0,.4);padding:1px 7px;border-radius:99px}
+.foot{margin:20px 0 10px;text-align:center;font-size:9px;letter-spacing:.3em;color:#2e6b50}
+.thead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.back{width:34px;height:34px;border-radius:10px;border:1px solid rgba(0,255,157,.4);background:rgba(3,21,14,.9);color:#00ff9d;font-size:16px}
+.ttl{flex:1;font-size:16px;font-weight:900;letter-spacing:.04em}
+.cnt{font-size:9px;color:#ffd700;border:1px solid rgba(255,215,0,.5);padding:3px 9px;border-radius:99px}
+.trow{width:100%;display:flex;align-items:center;gap:10px;border:1px solid rgba(0,255,157,.2);background:rgba(4,21,14,.9);border-radius:10px;padding:10px 12px;margin-bottom:8px;text-align:left}
+.trow:active{background:rgba(0,255,157,.08)}
+.trow .no{width:22px;font-size:10px;color:#ffd700;font-family:monospace}
+.trow .nm{flex:1;font-size:12.5px;color:#eafff4}
+.led{display:flex;align-items:center;gap:5px;font-size:8px;color:#00ff9d}
+.dot{width:6px;height:6px;border-radius:50%;background:#00ff9d;box-shadow:0 0 6px #00ff9d}
+.pn{display:flex;flex-direction:column;align-items:center;text-align:center;padding:30px 20px;border:1px dashed rgba(0,255,157,.3);border-radius:14px;background:rgba(4,21,14,.7)}
+.pn .i{font-size:34px}
+.pn .t{margin-top:8px;font-size:15px;font-weight:900}
+.pn .s{margin-top:8px;font-size:9px;color:#00ff9d;letter-spacing:.2em}
+.pn p{margin-top:10px;font-size:11px;color:#7cc7a8;line-height:1.5}
+.tin{width:100%;height:110px;background:rgba(3,21,14,.9);border:1px solid rgba(0,255,157,.3);border-radius:10px;color:#eafff4;padding:10px;font-size:13px;resize:vertical}
+.fin{width:100%;background:rgba(3,21,14,.9);border:1px solid rgba(0,255,157,.3);border-radius:10px;color:#eafff4;padding:10px;font-size:13px;margin-top:4px}
+.lb{display:block;font-size:10px;letter-spacing:.15em;color:#8affd0;margin-top:10px;text-transform:uppercase}
+.btn{display:block;width:100%;margin-top:12px;padding:12px;border:none;border-radius:10px;font-size:12px;font-weight:900;letter-spacing:.15em;color:#031209;background:linear-gradient(90deg,#00ff9d,#ffd700);text-align:center;text-decoration:none}
+.btn2{display:inline-block;margin-top:12px;padding:9px 14px;border:1px solid rgba(0,255,157,.4);background:rgba(3,21,14,.9);border-radius:10px;font-size:11px;font-weight:700;color:#00ff9d}
+.out{margin-top:12px;white-space:pre-wrap;word-break:break-all;background:rgba(3,21,14,.9);border:1px solid rgba(0,255,157,.2);border-radius:10px;padding:12px;font-size:12.5px;font-family:monospace;color:#eafff4}
+.out b{color:#ffd700}
+.kv{display:flex;justify-content:space-between;border-bottom:1px solid rgba(0,255,157,.12);padding:8px 2px;font-size:11.5px}
+.kv i{color:#8affd0;font-style:normal}
+.kv b{color:#eafff4;text-align:right;max-width:60%;font-weight:400;word-break:break-all}
+select.fin{appearance:none}
+canvas.qr{background:#fff;border-radius:8px;margin-top:12px;padding:8px}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.pad button{padding:13px 0;border:1px solid rgba(0,255,157,.3);background:rgba(3,21,14,.95);color:#eafff4;border-radius:10px;font-size:15px;font-weight:700}
+.disp{width:100%;background:#031209;border:1px solid rgba(0,255,157,.4);border-radius:10px;padding:12px;font-size:20px;font-family:monospace;color:#00ff9d;text-align:right;overflow-x:auto;white-space:nowrap}
+.bigt{font-size:26px;font-weight:900;color:#00ff9d;text-align:center;margin-top:14px}
+small.h{display:block;font-size:9px;color:#2e6b50;margin-top:6px;text-align:center;letter-spacing:.2em}
+</style>
+</head>
+<body>
+<div id="bg"><div id="grid"></div><div class="orb" id="orb1"></div><div class="orb" id="orb2"></div></div>
+<div id="splash"></div>
+<div id="page"></div>
+<nav id="nav"></nav>
+<div id="scan"></div>
+<script>
+var CATS=[
+{name:"Image Tools",e:"🖼️",t:["Image Compressor","Image Resizer","PNG → JPG","JPG → PNG","WebP Converter","Image Cropper","Rotate Image","Flip Image","Base64 Encode","Base64 Decode","Image → PDF","Photo Watermark","Image Blur","Sharpen Image","Grayscale Filter","Brightness Adjust","Contrast Adjust","Color Picker","Screenshot Tool","Palette Generator","ICO Converter","GIF Maker","Meme Maker","Image Splitter","Image Merger"]},
+{name:"PDF Tools",e:"📄",t:["PDF Merger","PDF Splitter","PDF Compressor","PDF → Images","Images → PDF","Delete PDF Pages","Rotate PDF Pages","Extract PDF Text","PDF Watermark","PDF Password Lock","PDF Password Unlock","PDF Metadata Editor","Reorder Pages","HTML → PDF","Text → PDF","Markdown → PDF","Excel → PDF","Word → PDF","PDF → Word","PDF → Text","PDF Viewer","PDF Annotation","PDF Bookmarks","Crop PDF Pages","PDF Flattener"]},
+{name:"Text & Code",e:"📝",t:["Word Counter","Character Counter","Case Converter","Reverse Text","Remove Duplicates","Remove Line Breaks","Text Sorter","Text Diff","Lorem Ipsum","Text to Slug","Find & Replace","Text Formatter","JSON Formatter","JSON → XML","XML → JSON","JSON Validator","CSV → JSON","JSON → CSV","SQL Formatter","HTML Formatter","CSS Formatter","JS Minifier","CSS Minifier","Markdown Preview","Text Encrypter"]},
+{name:"Converters",e:"🔄",t:["Unit Converter","Length Converter","Weight Converter","Temperature","Speed Converter","Area Converter","Volume Converter","Data Size","Time Converter","Angle Converter","Pressure Converter","Energy Converter","Power Converter","Fuel Economy","Shoe Size","Clothing Size","Roman Numerals","Number Base","Timestamp Converter","Timezone Converter","Currency Rates","Text → Binary","Binary → Text","Text → Hex","Morse Code"]},
+{name:"Calculators",e:"🧮",t:["Basic Calculator","Scientific Calculator","Age Calculator","BMI Calculator","Loan / EMI","Compound Interest","Discount Calculator","Percentage Calc","GST / VAT","Tip Calculator","Date Difference","Date Add / Sub","Time Calculator","Fuel Cost","Salary Calculator","Income Tax","Bill Split","Ratio Calculator","Fraction Calc","Random Number","Matrix Calculator","Quadratic Solver","Statistics Calc","Prime Checker","Number Series"]},
+{name:"Network & IP",e:"🌐",t:["IP Lookup","My IP Address","Ping Tool","Port Scanner","DNS Lookup","WHOIS Lookup","Subnet Calculator","MAC Lookup","Speed Test","WiFi Analyzer","HTTP Headers","URL Encoder","URL Decoder","SSL Checker","Trace Route","Wake on LAN","Geo IP Map","Email Validator","MX Record Lookup","Bandwidth Calc","Uptime Monitor","Proxy Checker","HTTP Status Codes","IP Range Scanner","DNS Propagation"]},
+{name:"QR & Barcode",e:"🔳",t:["QR Generator","QR Scanner","QR with Logo","WiFi QR","vCard QR","Email QR","SMS QR","Phone QR","Event QR","Geo QR","Text QR","URL QR","Batch QR","QR History","Barcode Generator","Barcode Scanner","EAN-13","Code 128","UPC-A","PDF417","Aztec Code","Data Matrix","Code 39","Codabar","ITF-14"]},
+{name:"Device & Sensor",e:"📱",t:["Device Info","CPU Monitor","RAM Monitor","Storage Info","Battery Status","Battery Health","Screen Test","Dead Pixel Test","Touch Test","Sensor List","Accelerometer","Gyroscope","Compass","Magnetometer","Light Sensor","Proximity Sensor","GPS Coordinates","GPS Speed","Altimeter","Sound Meter","Vibration Test","Flashlight","Brightness Test","Multi-Touch Test","Speaker Test"]},
+{name:"Security & Privacy",e:"🔐",t:["Password Generator","PIN Generator","Passphrase Generator","Password Strength","MD5 Hash","SHA-1 Hash","SHA-256 Hash","SHA-512 Hash","HMAC Generator","Checksum Tool","CRC32 Hash","Base32 Encode","AES Encrypt","AES Decrypt","TOTP Generator","Credit Card Validator","IBAN Validator","File Checksum","Secure Notes","UUID Generator","Random Bytes","Crypto Key Generator","Text Obfuscator","Privacy Cleaner","App Lock"]},
+{name:"Audio & Video",e:"🎵",t:["Audio Recorder","Audio Cutter","Audio Converter","Audio Merger","Volume Booster","Speed Changer","Noise Reducer","Audio Extractor","Video Compressor","Video Cutter","Video Merger","Video → GIF","Video Speed","Video Reverse","Video Mute","Video Rotate","Video Crop","Frame Extractor","MP3 Cutter","WAV → MP3","MP3 → WAV","M4A Converter","FLAC Converter","Voice Changer","Metronome"]},
+{name:"Utility & Daily",e:"🛠️",t:["Flashlight Torch","Mirror Camera","Ruler","Protractor","Bubble Level","Speedometer","Clinometer","Alarm Clock","Stopwatch","Timer","Pomodoro Timer","World Clock","Countdown","Calendar","Habit Tracker","Quick Notes","To-Do List","Reminder","Dice Roller","Coin Flip","Random Picker","Decision Wheel","Countdown Days","Name Picker","Price Compare"]},
+{name:"AI Tools",e:"🤖",t:["Text Summarizer","Text Translator","Grammar Fixer","Paraphraser","AI Writer","Code Explainer","Code Generator","Regex Explainer","Regex Builder","Text to Emoji","Tone Analyzer","Keyword Extractor","Name Generator","Bio Generator","Email Writer","Poem Writer","Story Writer","Quote Maker","Slogan Maker","Resume Builder","Blog Outline","Product Description","Study Notes Maker","Flashcard Maker","Idea Brainstorm"]}];
+var TOTAL=0;CATS.forEach(function(c){TOTAL+=c.t.length});
+var IMPL={};
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function db(k,v){try{if(v===undefined){var x=localStorage.getItem("gitb_"+k);return x?JSON.parse(x):null}localStorage.setItem("gitb_"+k,JSON.stringify(v))}catch(e){return null}}
+var ridx=0;
+function logo(sz,ring){
+ var id="g"+(ridx++);
+ var ring2=ring?'<g style="animation:spin 14s linear infinite;transform-origin:100px 88px"><circle cx="100" cy="88" r="82" fill="none" stroke="rgba(0,255,136,.35)" stroke-width="2" stroke-dasharray="10 14"/><circle cx="100" cy="88" r="74" fill="none" stroke="rgba(255,215,0,.3)" stroke-width="1.5" stroke-dasharray="2 10"/></g>':"";
+ var extr="";[10,8,6,4,2].forEach(function(o){extr+='<text x="'+(100+o)+'" y="'+(118+o)+'" text-anchor="middle" fill="#7a5200" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="92">GI</text>'});
+ return '<svg width="'+sz+'" height="'+(sz*0.85)+'" viewBox="0 0 200 170" style="filter:drop-shadow(0 0 14px rgba(255,200,40,.5)) drop-shadow(0 0 26px rgba(0,255,136,.25))"><defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff7c2"/><stop offset="30%" stop-color="#ffd700"/><stop offset="55%" stop-color="#f0b400"/><stop offset="100%" stop-color="#9a6b00"/></linearGradient></defs>'+ring2+extr+'<text x="100" y="118" text-anchor="middle" fill="url(#'+id+')" stroke="#5c3d00" stroke-width="2.5" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="92">GI</text><text x="100" y="70" text-anchor="middle" fill="rgba(255,255,255,.5)" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="92" style="clip-path:inset(0 0 62% 0)">GI</text></svg>';
+}
+function initSplash(){
+ var p=$("page");p.style.display="none";
+ $("splash").innerHTML='<div style="display:flex;flex-direction:column;align-items:center">'+logo(180,true)+'<h1 class="neon" style="font-family:Arial Black,sans-serif;font-size:32px;letter-spacing:.14em;margin-top:6px">GIToolbox</h1><p class="sub" style="margin-top:8px">ALL-IN-ONE · '+TOTAL+' FEATURES</p><div style="margin-top:22px;width:220px;height:5px;border:1px solid rgba(0,255,157,.3);border-radius:99px;overflow:hidden;background:#0c2b1e"><div id="spbar" style="height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,#00ff9d,#ffd700);box-shadow:0 0 10px rgba(0,255,150,.8)"></div></div><div style="margin-top:20px">'+logo(54,false)+'</div><p class="gold" style="margin-top:4px;font-family:Arial Black,sans-serif;font-size:13px;font-weight:900;letter-spacing:.26em">POWERED BY I KO KO</p></div>';
+ var w=0;var iv=setInterval(function(){w+=3;$("spbar").style.width=w+"%";if(w>=100){clearInterval(iv);setTimeout(closeSplash,250)}},80);
+}
+function closeSplash(){$("splash").classList.add("hide");$("page").style.display="block";navTo("home")}
+function navTo(v){location.hash=v}
+window.onhashchange=function(){clearTimers();render()};
+function render(){
+ var h=location.hash.replace("#","")||"home";
+ var m;
+ if(h==="home")renderHome();
+ else if(h==="all")renderAll();
+ else if(h==="about")renderAbout();
+ else if((m=h.match(/^c\/(\d+)$/)))renderCat(+m[1]);
+ else if((m=h.match(/^t\/(\d+)\/(\d+)$/)))renderTool(+m[1],+m[2]);
+ else renderHome();
+ renderNav(h);
+}
+function renderNav(h){
+ var base=h.split("/")[0]||"home";
+ var items=[["home","⌂","HOME"],["all","☰","TOOLS"],["about","★","ABOUT"]];
+ $("nav").innerHTML=items.map(function(it){return '<button onclick="navTo(\''+it[0]+'\')" class="'+(base===it[0]?"act":"")+'"><b>'+it[1]+'</b>'+it[2]+'</button>'}).join("");
+}
+function renderHome(){
+ var html='<div class="hdr">'+logo(50,false)+'<div style="flex:1"><h1 class="neon">GIToolbox</h1><p class="sub">'+TOTAL+' FEATURES · ALL-IN-ONE</p></div><span class="ver">v1.0</span></div>'
+ +'<div class="srch"><span style="color:#00ff9d">⌕</span><input id="q" oninput="filterCats()" placeholder="Search 300+ tools..."/><button onclick="resetQ()" style="background:none;border:none;color:#3f8a6b">✕</button></div>'
+ +'<div class="banner"><p style="font-size:13px;font-weight:900" class="gold">⚡ ALL-IN-ONE TOOLBOX</p><p style="font-size:10px;color:#bfe9d8;margin-top:2px">Cyber Edition · Green • Gold • Dark · POWERED BY I KO KO</p></div>'
+ +'<p class="secl">CATEGORIES · '+CATS.length+'</p><div class="grid" id="cg"></div>'
+ +'<p class="foot">POWERED BY I KO KO</p>';
+ $("page").innerHTML=html;filterCats();
+}
+function resetQ(){$("q").value="";filterCats()}
+function filterCats(){
+ var q=($("q")?$("q").value:"").toLowerCase();
+ var html="";var n=0;
+ CATS.forEach(function(c,i){
+  var hit=!q||c.name.toLowerCase().indexOf(q)>=0||c.t.some(function(t){return t.toLowerCase().indexOf(q)>=0});
+  if(hit){n++;html+='<button class="cat" onclick="navTo(\'c/'+i+'\')"><span class="e">'+c.e+'</span><span class="n">'+esc(c.name)+'</span><span class="c">'+c.t.length+' TOOLS</span></button>'}
+ });
+ if(!n)html='<p style="grid-column:span 3;text-align:center;color:#3f8a6b;padding:24px 0;font-size:12px">No tool found</p>';
+ $("cg").innerHTML=html;
+}
+function renderAll(){
+ var html='<div class="hdr"><div style="flex:1"><h1 class="neon">All Tools</h1><p class="sub">'+TOTAL+' FEATURES</p></div><span class="cnt">'+CATS.length+' CATS</span></div>';
+ CATS.forEach(function(c,i){
+  html+='<p class="secl">'+c.e+' '+esc(c.name)+' · '+c.t.length+'</p>';
+  html+=c.t.map(function(t,j){return toolRow(i,j,t)}).join("");
+ });
+ $("page").innerHTML=html;
+}
+function toolRow(ci,ti,t){
+ return '<button class="trow" onclick="navTo(\'t/'+ci+'/'+ti+'\')"><span class="no">'+String(ti+1).padStart(2,"0")+'</span><span class="nm">'+esc(t)+'</span><span class="led"><span class="dot"></span>READY</span></button>';
+}
+function renderCat(ci){
+ var c=CATS[ci];
+ var html='<div class="thead"><button class="back" onclick="navTo(\'home\')">←</button><span style="font-size:20px">'+c.e+'</span><div class="ttl neon">'+esc(c.name)+'</div><span class="cnt">'+c.t.length+'</span></div>';
+ html+=c.t.map(function(t,j){return toolRow(ci,j,t)}).join("");
+ $("page").innerHTML=html;
+}
+function renderTool(ci,ti){
+ var c=CATS[ci],t=c.t[ti];
+ $("page").innerHTML='<div class="thead"><button class="back" onclick="navTo(\'c/'+ci+'\')">←</button><div class="ttl neon">'+esc(t)+'</div><span class="cnt">'+c.e+'</span></div><div id="tc"></div>';
+ var box=$("tc");
+ if(IMPL[t])IMPL[t](box);else panel(box,t);
+}
+function panel(box,name){
+ box.innerHTML='<div class="pn"><div class="i">⚡</div><div class="t">'+esc(name)+'</div><div class="s"><span class="led"><span class="dot"></span>SLOT READY · '+TOTAL+' TOOL SUITE</span></div><p>This tool slot is reserved and registered in the suite. Its engine module ships with the next APK build update.</p><small class="h">POWERED BY I KO KO</small></div>';
+}
+function renderAbout(){
+ $("page").innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;text-align:center">'+logo(170,true)+'<h1 class="neon" style="font-family:Arial Black,sans-serif;font-size:24px;letter-spacing:.14em;margin-top:4px">GIToolbox</h1><p class="sub" style="margin-top:8px">ALL-IN-ONE · '+TOTAL+' FEATURES · V1.0</p><div style="margin-top:18px;border:1px solid rgba(255,215,0,.4);border-radius:12px;padding:12px 22px;background:rgba(255,215,0,.05)"><p class="gold" style="font-family:Arial Black,sans-serif;font-weight:900;letter-spacing:.26em;font-size:14px">POWERED BY I KO KO</p></div><p style="margin-top:16px;font-size:10px;color:#3f8a6b;line-height:1.7">CYBER EDITION — GREEN • GOLD • DARK<br/>MOST TOOLS RUN FULLY OFFLINE</p></div>';
+}
+var IOFN=null,FORMFN=null;
+function ioUI(ph,btn){return '<textarea class="tin" id="ioin" placeholder="'+(ph||"Type or paste text here...")+'"></textarea><button class="btn" onclick="runIO()">'+(btn||"RUN")+'</button><div class="out" id="ioout" style="display:none"></div>'}
+function regIO(name,fn,ph,btn){IMPL[name]=function(box){box.innerHTML=ioUI(ph,btn);IOFN=fn}}
+function runIO(){var o=$("ioout");o.style.display="block";try{o.innerHTML=IOFN($("ioin").value)}catch(e){o.textContent="Error: "+e.message}}
+function formUI(f,btn){
+ var h="";
+ f.forEach(function(x){
+  h+='<label class="lb">'+x[1]+'</label>';
+  if(x[2]==="sel")h+='<select class="fin" id="f_'+x[0]+'">'+x[3].map(function(o){return '<option value="'+esc(o)+'">'+esc(o)+'</option>'}).join("")+'</select>';
+  else h+='<input class="fin" id="f_'+x[0]+'" type="'+(x[2]||"text")+'" value="'+(x[3]!==undefined?esc(x[3]):"")+'" '+(x[4]?'placeholder="'+esc(x[4])+'"':"")+'/>';
+ });
+ h+='<button class="btn" onclick="runForm()">'+(btn||"CALCULATE")+'</button><div class="out" id="formout" style="display:none"></div>';
+ return h;
+}
+function regForm(name,f,fn,btn){IMPL[name]=function(box){box.innerHTML=formUI(f,btn);FORMFN=fn}}
+function runForm(){
+ var v={};Array.prototype.forEach.call(document.querySelectorAll(".fin"),function(i){v[i.id.slice(2)]=i.value});
+ var o=$("formout");o.style.display="block";try{o.innerHTML=FORMFN(v)}catch(e){o.textContent="Error: "+e.message}
+}
+function num(s){var n=parseFloat(s);if(isNaN(n))throw new Error("Enter valid numbers");return n}
+function r2(x){return Math.round(x*100)/100}
+function fmt(x){return (Math.round(x*100)/100).toLocaleString()}
+function convUI(units){
+ var opts=units.map(function(u){return '<option>'+u+'</option>'}).join("");
+ return '<label class="lb">FROM</label><select class="fin" id="f_from">'+opts+'</select><label class="lb">VALUE</label><input class="fin" id="f_val" type="number" value="1"/><label class="lb">TO</label><select class="fin" id="f_to">'+opts+'</select><button class="btn" onclick="runConv()">CONVERT</button><div class="out" id="convout" style="display:none"></div>';
+}
+var CONVTAB=null;
+function regConv(name,tab){IMPL[name]=function(box){box.innerHTML=convUI(Object.keys(tab));CONVTAB=tab}}
+function runConv(){
+ var o=$("convout");o.style.display="block";
+ var v=num($("f_val").value),f=$("f_from").value,t=$("f_to").value;
+ if(CONVTAB!==null){o.innerHTML=fmt(v)+" <b>"+f+"</b> = <b>"+fmt(v*CONVTAB[f]/CONVTAB[t])+"</b> "+t;return}
+ function toC(x,u){return u==="°C"?x:u==="°F"?(x-32)*5/9:x-273.15}
+ function fromC(x,u){return u==="°C"?x:u==="°F"?x*9/5+32:x+273.15}
+ o.innerHTML=fmt(v)+" <b>"+f+"</b> = <b>"+fmt(fromC(toC(v,f),t))+"</b> "+t;
+}
+var IM_IMG=null,IM_APPLY=null,IM_FNAME="";
+function imPickFile(cb){
+ box=cb;
+ var f=$("imf");
+ f.onchange=function(){
+  var file=f.files[0];if(!file)return;
+  var fr=new FileReader();
+  fr.onload=function(){var img=new Image();img.onload=function(){IM_IMG=img;$("imc").style.display="block";$("imr").style.display="block";$("imres").innerHTML="";var s=$("f_q");if(s)s.oninput=function(){if($("qv"))$("qv").textContent=s.value}};img.src=fr.result};
+  fr.readAsDataURL(file);
+ };
+}
+var box=null;
+function regImg(name,controls,apply,fname){IMPL[name]=function(b){
+ b.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$('imf').click()">📁 CHOOSE IMAGE</button><div id="imc" style="display:none">'+(controls||"")+'</div><button class="btn" id="imr" style="display:none" onclick="imGo()">⚡ APPLY & SAVE</button><div id="imres"></div>';
+ IM_APPLY=apply;IM_FNAME=fname||"gitoolbox.png";imPickFile(b);
+}}
+function imGo(){
+ try{
+  var r=IM_APPLY();
+  if(!r)return;
+  var res=$("imres");res.innerHTML="";
+  if(r.note)res.innerHTML='<div class="out">'+r.note+"</div>";
+  (r.cvs||[]).forEach(function(cv){cv.style.maxWidth="100%";cv.style.borderRadius="8px";cv.style.marginTop="12px";res.appendChild(cv)});
+  if(r.url){var a=document.createElement("a");a.className="btn";a.textContent="💾 SAVE "+IM_FNAME;a.download=IM_FNAME;a.href=r.url;res.appendChild(a)}
+ }catch(e){$("imres").innerHTML='<div class="out">Error: '+esc(e.message)+"</div>"}
+}
+function imCanvas(w,h){var cv=document.createElement("canvas");cv.width=w;cv.height=h;return cv}
+function scaleMax(img){var M=1200,s=Math.min(1,M/Math.max(img.width,img.height));return [Math.round(img.width*s),Math.round(img.height*s)]}
+var K256=[],H256=[];
+(function(){
+ function ip(n){for(var i=2;i*i<=n;i++)if(n%i===0)return false;return true}
+ var pc=0;
+ for(var n=2;pc<64;n++){if(ip(n)){K256[pc]=Math.floor((Math.cbrt(n)%1)*4294967296);pc++}}
+ pc=0;for(n=2;pc<8;n++){if(ip(n)){H256[pc]=Math.floor((Math.sqrt(n)%1)*4294967296);pc++}}
+})();
+function rotr(x,n){return (x>>>n)|(x<<(32-n))}
+function sha256(msg){
+ var len=msg.length,lo=(len%536870912)*8,hi=Math.floor(len/536870912);
+ msg=msg.slice();msg.push(0x80);
+ while(msg.length%64!==56)msg.push(0);
+ msg.push(hi>>>24&255,hi>>>16&255,hi>>>8&255,hi&255,lo>>>24&255,lo>>>16&255,lo>>>8&255,lo&255);
+ var h=H256.slice();
+ for(var b=0;b<msg.length;b+=64){
+  var w=new Array(64),i;
+  for(i=0;i<16;i++)w[i]=(msg[b+4*i]<<24)|(msg[b+4*i+1]<<16)|(msg[b+4*i+2]<<8)|msg[b+4*i+3];
+  for(i=16;i<64;i++){var s0=rotr(w[i-15],7)^rotr(w[i-15],18)^(w[i-15]>>>3),s1=rotr(w[i-2],17)^rotr(w[i-2],19)^(w[i-2]>>>10);w[i]=(w[i-16]+s0+w[i-7]+s1)|0}
+  var a=h[0],b2=h[1],c=h[2],d=h[3],e=h[4],f=h[5],g=h[6],hh=h[7];
+  for(i=0;i<64;i++){
+   var S1=rotr(e,6)^rotr(e,11)^rotr(e,25),ch=(e&f)^(~e&g),t1=(hh+S1+ch+K256[i]+w[i])|0;
+   var S0=rotr(a,2)^rotr(a,13)^rotr(a,22),maj=(a&b2)^(a&c)^(b2&c),t2=(S0+maj)|0;
+   hh=g;g=f;f=e;e=(d+t1)|0;d=c;c=b2;b2=a;a=(t1+t2)|0;
+  }
+  h[0]=(h[0]+a)|0;h[1]=(h[1]+b2)|0;h[2]=(h[2]+c)|0;h[3]=(h[3]+d)|0;h[4]=(h[4]+e)|0;h[5]=(h[5]+f)|0;h[6]=(h[6]+g)|0;h[7]=(h[7]+hh)|0;
+ }
+ var out=[];for(i=0;i<8;i++){out.push(h[i]>>>24&255,h[i]>>>16&255,h[i]>>>8&255,h[i]&255)}
+ return out;
+}
+function hex(buf){return buf.map(function(b){return (b<16?"0":"")+b.toString(16)}).join("")}
+var CRCT=(function(){var t=[],c;for(var n=0;n<256;n++){c=n;for(var k=0;k<8;k++)c=c&1?(3988292384^(c>>>1)):(c>>>1);t[n]=c>>>0}return t})();
+function crc32(buf){var c=4294967295;for(var i=0;i<buf.length;i++)c=CRCT[(c^buf[i])&255]^(c>>>8);return ((c^4294967295)>>>0)}
+function strBytes(s){var o=[];for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c<128)o.push(c);else if(c<2048){o.push(192|c>>6,128|c&63)}else{o.push(224|c>>12,128|c>>6&63,128|c&63)}}return o}
+var GEXP=new Array(512),GLOG=new Array(256);
+(function(){var x=1;for(var i=0;i<255;i++){GEXP[i]=x;GLOG[x]=i;x<<=1;if(x&256)x^=0x11d}for(i=255;i<512;i++)GEXP[i]=GEXP[i-255]})();
+function gmul(a,b){return (a===0||b===0)?0:GEXP[GLOG[a]+GLOG[b]]}
+function rsGen(n){var g=[1];for(var i=0;i<n;i++){var ng=new Array(g.length+1);for(var j=0;j<g.length;j++){ng[j]=(ng[j]||0)^gmul(g[j],GEXP[i]);ng[j+1]=(ng[j+1]||0)^g[j]}g=ng}return g}
+function rsRem(data,n){var gen=rsGen(n).reverse(),res=data.slice(),i,j;for(i=0;i<n;i++)res.push(0);for(i=0;i<res.length-n;i++){var c=res[i];if(c!==0)for(j=0;j<gen.length;j++)res[i+j]^=gmul(gen[j],c)}return res.slice(res.length-n)}
+function qrEncode(text){
+ var bytes=new TextEncoder().encode(text);
+ var caps=[19,34,55,80,108],ecs=[7,10,15,20,26],v=0;
+ while(v<5&&caps[v]*8<12+bytes.length*8)v++;
+ if(v>=5)throw new Error("Max ~106 characters");
+ var cap=caps[v],ec=ecs[v],bits=[];
+ function pb(val,len){for(var i=len-1;i>=0;i--)bits.push((val>>i)&1)}
+ pb(4,4);pb(bytes.length,8);
+ for(var i=0;i<bytes.length;i++)pb(bytes[i],8);
+ pb(0,Math.min(4,cap*8-bits.length));
+ while(bits.length%8!==0)bits.push(0);
+ var cw=[],i2,j2;
+ for(i2=0;i2<bits.length;i2+=8){var bb=0;for(j2=0;j2<8;j2++)bb=(bb<<1)|bits[i2+j2];cw.push(bb)}
+ var pad=true;while(cw.length<cap){cw.push(pad?236:17);pad=!pad}
+ var full=cw.concat(rsRem(cw,ec));
+ var size=21+4*v,M=[],R=[],r,c;
+ for(r=0;r<size;r++){M.push([]);R.push([]);for(c=0;c<size;c++){M[r][c]=0;R[r][c]=false}}
+ function fn(r,c,dark){R[r][c]=true;M[r][c]=dark?1:0}
+ function finder(r0,c0){for(var dr=-1;dr<=7;dr++)for(var dc=-1;dc<=7;dc++){var rr=r0+dr,cc=c0+dc;if(rr<0||rr>=size||cc<0||cc>=size)continue;fn(rr,cc,dr>=0&&dr<=6&&dc>=0&&dc<=6&&(dr===0||dr===6||dc===0||dc===6||(dr>=2&&dr<=4&&dc>=2&&dc<=4)))}}
+ finder(0,0);finder(size-7,0);finder(0,size-7);
+ for(i=8;i<size-8;i++){if(!R[6][i])fn(6,i,i%2===0);if(!R[i][6])fn(i,6,i%2===0)}
+ var cen=[0,18,22,26,30][v];
+ if(cen){var cs=[6,cen];for(var a=0;a<2;a++)for(var b=0;b<2;b++){if(R[cs[a]][cs[b]])continue;for(var dr2=-2;dr2<=2;dr2++)for(var dc2=-2;dc2<=2;dc2++)fn(cs[a]+dr2,cs[b]+dc2,Math.max(Math.abs(dr2),Math.abs(dc2))!==1)}}
+ fn(size-8,8,true);
+ var fd=8,d=fd<<10,g=0x537;
+ for(i=14;i>=10;i--){if((d>>i)&1)d^=g<<(i-10)}
+ var fmt=((fd<<10)|(d&1023))^0x5412;
+ function gb(x,i){return (x>>>i)&1}
+ for(i=0;i<=5;i++)fn(8,i,gb(fmt,i));
+ fn(8,7,gb(fmt,6));fn(8,8,gb(fmt,7));fn(7,8,gb(fmt,8));
+ for(i=9;i<=14;i++)fn(14-i,8,gb(fmt,i));
+ for(i=0;i<=7;i++)fn(size-1-i,8,gb(fmt,i));
+ for(i=8;i<=14;i++)fn(8,size-15+i,gb(fmt,i));
+ var bi=0,tb=full.length*8;
+ for(var right=size-1;right>=1;right-=2){
+  if(right===6)right=5;
+  for(var vert=0;vert<size;vert++){
+   for(var j=0;j<2;j++){
+    var cc=right-j,up=((right+1)&2)===0,rr=up?size-1-vert:vert;
+    if(R[rr][cc])continue;
+    var dark=false;
+    if(bi<tb){dark=((full[bi>>3]>>>(7-(bi&7)))&1)===1;bi++}
+    if((rr+cc)%2===0)dark=!dark;
+    M[rr][cc]=dark?1:0;
+   }
+  }
+ }
+ return {size:size,M:M};
+}
+function qrCanvas(text,scale){
+ var q=qrEncode(text),s=scale||6,quiet=4,cv=imCanvas((q.size+quiet*2)*s,(q.size+quiet*2)*s),x=cv.getContext("2d");
+ x.fillStyle="#ffffff";x.fillRect(0,0,cv.width,cv.height);
+ x.fillStyle="#06231A";
+ for(var r=0;r<q.size;r++)for(var c=0;c<q.size;c++)if(q.M[r][c])x.fillRect((c+quiet)*s,(r+quiet)*s,s,s);
+ return cv;
+}
+function qrUI(box,getText,btn){
+ box.innerHTML='<textarea class="tin" id="qrt" style="height:70px" placeholder="Enter text...">'+(getText||"")+'</textarea><button class="btn" onclick="qrGen2()">'+(btn||"⚡ GENERATE QR")+'</button><div id="qrres"></div>';
+}
+function qrGen2(){
+ var t=$("qrt").value;if(!t.trim()){qrErr("Enter some text first");return}
+ qrTextGo(t,true);
+}
+function qrErr(m){$("qrres").innerHTML='<div class="out">Error: '+esc(m)+"</div>"}
+function qrTextGo(text,save){
+ try{
+  var cv=qrCanvas(text);cv.className="qr";cv.style.display="block";cv.style.margin="12px auto";
+  var res=$("qrres");res.innerHTML="";res.appendChild(cv);
+  if(save!==false){var hist=db("qrhist",[])||[];hist.unshift(text);db("qrhist",hist.slice(0,50))}
+  var a=document.createElement("a");a.className="btn";a.textContent="💾 SAVE QR PNG";a.download="GIToolbox_QR.png";a.href=cv.toDataURL("image/png");res.appendChild(a);
+ }catch(e){qrErr(e.message)}
+}
+function makePdf(txt){
+ function pe(s){return s.replace(/[\\()]/g,function(m){return "\\"+m}).replace(/[^\x20-\x7E]/g,"?")}
+ var lines=[];
+ txt.split("\n").forEach(function(p){while(p.length>90){lines.push(p.slice(0,90));p=p.slice(90)}lines.push(p)});
+ if(!lines.length)lines=[""];
+ var pages=[];for(var i=0;i<lines.length;i+=46)pages.push(lines.slice(i,i+46));
+ if(!pages.length)pages=[[""]];
+ var out="%PDF-1.4\n",offs=[];
+ function add(s){offs.push(out.length);out+=s}
+ add("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+ var kids=[];pages.forEach(function(p,idx){kids.push(String(4+idx*2))});
+ add("2 0 obj\n<< /Type /Pages /Kids ["+kids.join(" ")+"] /Count "+pages.length+" >>\nendobj\n");
+ add("3 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n");
+ pages.forEach(function(pl,idx){
+  var content="BT /F1 11 Tf\n",y=780;
+  pl.forEach(function(l){content+="1 0 0 1 40 "+y+" Tm ("+pe(l)+") Tj\n";y-=15});
+  content+="ET\n";
+  add(String(4+idx*2)+" 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents "+String(5+idx*2)+" 0 R >>\nendobj\n");
+  add(String(5+idx*2)+" 0 obj\n<< /Length "+content.length+" >>\nstream\n"+content+"endstream\nendobj\n");
+ });
+ var xr=out.length;
+ out+="xref\n0 "+(offs.length+1)+"\n0000000000 65535 f \n";
+ offs.forEach(function(off){var o=String(off);while(o.length<10)o="0"+o;out+=o+" 00000 n \n"});
+ out+="trailer\n<< /Size "+(offs.length+1)+" /Root 1 0 R >>\nstartxref\n"+xr+"\n%%EOF";
+ return out;
+}
+function makeImagePdf(images){
+ var out="%PDF-1.4\n",offs=[];
+ function add(s){offs.push(out.length);out+=s}
+ var kids=[];
+ images.forEach(function(im,idx){kids.push(String(3+idx*3))});
+ add("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+ add("2 0 obj\n<< /Type /Pages /Kids ["+kids.join(" ")+"] /Count "+images.length+" >>\nendobj\n");
+ images.forEach(function(im,idx){
+  var base=3+idx*3;
+  var W=im.w,H=im.h;
+  var content="q "+W+" 0 0 "+H+" 0 0 cm /Im0 Do Q\n";
+  add(String(base)+" 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 "+W+" "+H+"] /Resources << /XObject << /Im0 "+String(base+2)+" 0 R >> >> /Contents "+String(base+1)+" 0 R >>\nendobj\n");
+  add(String(base+1)+" 0 obj\n<< /Length "+content.length+" >>\nstream\n"+content+"endstream\nendobj\n");
+  out=out.replace(/END$/,"");
+  offs.push(out.length);
+  out+=String(base+2)+" 0 obj\n<< /Type /XObject /Subtype /Image /Width "+W+" /Height "+H+" /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+im.bin.length+" >>\nstream\n"+im.bin+"\nendstream\nendobj\n";
+ });
+ var xr=out.length;
+ out+="xref\n0 "+(offs.length+1)+"\n0000000000 65535 f \n";
+ offs.forEach(function(off){var o=String(off);while(o.length<10)o="0"+o;out+=o+" 00000 n \n"});
+ out+="trailer\n<< /Size "+(offs.length+1)+" /Root 1 0 R >>\nstartxref\n"+xr+"\n%%EOF";
+ return out;
+}
+function evalExpr(s){
+ s=String(s).replace(/×/g,"*").replace(/÷/g,"/").replace(/π/g,"pi").replace(/−/g,"-").replace(/,/g,"");
+ var clean=s.replace(/(sin|cos|tan|log|ln|sqrt|abs|pi|e)/g,"");
+ if(/[^0-9+\-*/().%\s]/.test(clean))throw new Error("Invalid characters");
+ var f='var sin=Math.sin,cos=Math.cos,tan=Math.tan,log=function(x){return Math.log(x)/Math.LN10},ln=Math.log,sqrt=Math.sqrt,abs=Math.abs,pi=Math.PI,e=Math.E;return ('+s.replace(/\^/g,"**")+")";
+ var r=Function('"use strict";'+f)();
+ if(typeof r!=="number"||!isFinite(r))throw new Error("Cannot compute");
+ return r;
+}
+var AC=null;
+function beep(freq,dur,vol){
+ try{
+  AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+  var o=AC.createOscillator(),g=AC.createGain();
+  o.frequency.value=freq;o.type="sine";
+  g.gain.value=vol||0.2;
+  o.connect(g);g.connect(AC.destination);
+  o.start();o.stop(AC.currentTime+(dur||0.1));
+ }catch(e){}
+}
+var TIMERS=[];
+function clearTimers(){TIMERS.forEach(function(t){clearInterval(t)});TIMERS=[]}
+/* ============ TEXT TOOLS ============ */
+regIO("Word Counter",function(v){var w=v.trim()?v.trim().split(/\s+/).length:0;return "Words:      "+w+"\nCharacters: "+v.length+"\nNo-space:   "+v.replace(/\s/g,"").length+"\nLines:      "+v.split("\n").length+"\nSentences:  "+(v.split(/[.!?]+/).length-1)});
+regIO("Character Counter",function(v){return "Characters: "+v.length+"\nWithout spaces: "+v.replace(/\s/g,"").length+"\nBytes(UTF-8): "+strBytes(v).length});
+IMPL["Case Converter"]=function(box){box.innerHTML='<label class="lb">MODE</label><select class="fin" id="f_m"><option>UPPERCASE</option><option>lowercase</option><option>Title Case</option><option>Sentence case</option><option>camelCase</option><option>snake_case</option><option>kebab-case</option></select>'+ioUI("Type text...","CONVERT");IOFN=function(v){var m=$("f_m").value,words=v.split(/\s+/);switch(m){case"UPPERCASE":return v.toUpperCase();case"lowercase":return v.toLowerCase();case"Title Case":return v.toLowerCase().replace(/\b\w/g,function(c){return c.toUpperCase()});case"Sentence case":return v.toLowerCase().replace(/(^|[.!?]\s+)(\w)/g,function(a,b,c){return b+c.toUpperCase()});case"camelCase":return words.map(function(w,i){w=w.toLowerCase();return i?w.charAt(0).toUpperCase()+w.slice(1):w}).join("");case"snake_case":return words.join("_").toLowerCase();default:return words.join("-").toLowerCase()}}};
+regIO("Reverse Text",function(v){return v.split("").reverse().join("")});
+regIO("Remove Duplicates",function(v){var seen={},o=[];v.split("\n").forEach(function(l){if(!seen[l]){seen[l]=true;o.push(l)}});return o.join("\n")});
+regIO("Remove Line Breaks",function(v){return v.replace(/\s*\n\s*/g," ").replace(/\s{2,}/g," ")});
+IMPL["Text Sorter"]=function(box){box.innerHTML='<label class="lb">ORDER</label><select class="fin" id="f_o"><option>A → Z</option><option>Z → A</option><option>Short → Long</option><option>Long → Short</option></select>'+ioUI("One item per line...","SORT");IOFN=function(v){var ls=v.split("\n"),o=$("f_o").value;if(o==="A → Z")ls.sort();else if(o==="Z → A")ls.sort().reverse();else if(o==="Short → Long")ls.sort(function(a,b){return a.length-b.length});else ls.sort(function(a,b){return b.length-a.length});return ls.join("\n")}};
+IMPL["Text Diff"]=function(box){box.innerHTML='<label class="lb">TEXT A</label><textarea class="tin" id="da" style="height:80px"></textarea><label class="lb">TEXT B</label><textarea class="tin" id="db" style="height:80px"></textarea><button class="btn" onclick="diffGo()">COMPARE</button><div class="out" id="ddout" style="display:none"></div>'};
+function diffGo(){
+ var a=$("da").value.split("\n"),b=$("db").value.split("\n"),out="";
+ a.forEach(function(l){if(b.indexOf(l)<0)out+="- "+l+"\n"});b.forEach(function(l){if(a.indexOf(l)<0)out+="+ "+l+"\n"});
+ $("ddout").style.display="block";$("ddout").textContent=out||"✔ Lines match (no diff found)";
+}
+regForm("Lorem Ipsum",[["n","PARAGRAPHS","number","3"]],function(v){
+ var w="lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum".split(" ");
+ var n=Math.min(10,Math.max(1,Math.round(num(v.n)))),out="";
+ for(var p=0;p<n;p++){var s=[];for(var i=0;i<18;i++)s.push(w[Math.floor(Math.random()*w.length)]);out+=s.join(" ").replace(/^\w/,function(c){return c.toUpperCase()})+".\n\n"}
+ return esc(out);
+});
+regIO("Text to Slug",function(v){return v.trim().toLowerCase().replace(/[^a-z0-9\s-]/g,"").replace(/\s+/g,"-").replace(/-+/g,"-").replace(/^-|-$/g,"")});
+IMPL["Find & Replace"]=function(box){box.innerHTML='<label class="lb">FIND</label><input class="fin" id="f_a" placeholder="find..."/><label class="lb">REPLACE</label><input class="fin" id="f_b" placeholder="replace with..."/>'+ioUI("Text...","REPLACE ALL");IOFN=function(v){return v.split($("f_a").value).join($("f_b").value)}};
+regIO("Text Formatter",function(v){return v.replace(/\t/g,"    ").replace(/[ \t]+/g," ").replace(/ ?\n ?/g,"\n").trim()});
+regIO("JSON Formatter",function(v){return JSON.stringify(JSON.parse(v),null,2)});
+regIO("JSON → XML",function(v){
+ var o=JSON.parse(v);function t(o,ind){var s="";for(var k in o){var v2=o[k];s+=ind+"<"+k+">";if(v2!==null&&typeof v2==="object")s+="\n"+t(v2,ind+"  ")+ind;else s+=v2;s+="</"+k+">\n"}return s}
+ return t(o,"");
+});
+IMPL["XML → JSON"]=function(box){box.innerHTML=ioUI("Paste XML...","CONVERT");IOFN=function(v){var d=new DOMParser().parseFromString(v,"text/xml");if(d.querySelector("parsererror"))throw new Error("Invalid XML");function t(el){var o={};for(var i=0;i<el.children.length;i++){var c=el.children[i];o[c.tagName]=c.children.length?t(c):c.textContent}if(!Object.keys(o).length)o=el.textContent;return o}return JSON.stringify(t(d.documentElement),null,2)}};
+regIO("JSON Validator",function(v){try{JSON.parse(v);return "✔ VALID JSON"}catch(e){return "✘ "+e.message}});
+IMPL["CSV → JSON"]=function(box){box.innerHTML=ioUI("name,age,city\nKo Ko,25,Yangon","CONVERT");IOFN=function(v){var ls=v.trim().split(/\n/),h=ls[0].split(",").map(function(x){return x.trim()});var o=ls.slice(1).map(function(l){var r={},c=l.split(",");h.forEach(function(k,i){r[k]=(c[i]||"").trim()});return r});return JSON.stringify(o,null,2)}};
+IMPL["JSON → CSV"]=function(box){box.innerHTML=ioUI('[{"name":"Ko Ko","age":25}]',"CONVERT");IOFN=function(v){var o=JSON.parse(v);if(!o.length)throw new Error("Empty array");var h=Object.keys(o[0]),out=h.join(",")+"\n";o.forEach(function(r){out+=h.map(function(k){var s=String(r[k]!==undefined?r[k]:"");return s.indexOf(",")>=0?'"'+s+'"':s}).join(",")+"\n"});return out}};
+regIO("SQL Formatter",function(v){return v.replace(/\b(SELECT|FROM|WHERE|AND|OR|JOIN|LEFT|RIGHT|INNER|GROUP BY|ORDER BY|LIMIT|INSERT INTO|VALUES|UPDATE|SET|DELETE)\b/g,"\n$1").replace(/\n\s*/g,"\n").trim()});
+regIO("HTML Formatter",function(v){return v.replace(/></g,">\n<").replace(/\n\s*/g,"\n")});
+regIO("CSS Formatter",function(v){return v.replace(/\s*\{\s*/g," {\n  ").replace(/;\s*/g,";\n  ").replace(/\s*\}\s*/g,"\n}\n")});
+regIO("JS Minifier",function(v){return v.replace(/\/\*[\s\S]*?\*\//g,"").replace(/(^|\n)\s*\/\/[^\n]*/g,"").replace(/\n\s*/g,"\n").replace(/\s*([{};])\s*/g,"$1").trim()});
+regIO("CSS Minifier",function(v){return v.replace(/\/\*[\s\S]*?\*\//g,"").replace(/\s+/g," ").replace(/ ?([{}:;,]) ?/g,"$1").trim()});
+IMPL["Markdown Preview"]=function(box){box.innerHTML=ioUI("# Heading · **bold** · ~code~ · - item","PREVIEW");IOFN=function(v){return esc(v).replace(/^### (.*)$/gm,"<h3>$1</h3>").replace(/^## (.*)$/gm,"<h2>$1</h2>").replace(/^# (.*)$/gm,"<h1>$1</h1>").replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/\*(.+?)\*/g,"<i>$1</i>").replace(/~(.+?)~/g,"<code>$1</code>").replace(/^- (.*)$/gm,"• $1").replace(/\n/g,"<br/>")}};
+IMPL["Text Encrypter"]=function(box){box.innerHTML='<label class="lb">KEY (PASSWORD)</label><input class="fin" id="f_k" value="GIKOKO"/>'+ioUI("Text...","🔒 ENCRYPT / DECRYPT");IOFN=function(v){return txXOR(v,$("f_k").value)}};
+function txXOR(t,k){var o="";for(var i=0;i<t.length;i++)o+=String.fromCharCode(t.charCodeAt(i)^k.charCodeAt(i%k.length));return btoa(unescape(encodeURIComponent(o)))}
+/* ============ CONVERTERS ============ */
+var ULEN={mm:0.001,cm:0.01,m:1,km:1000,in:0.0254,ft:0.3048,yd:0.9144,mi:1609.344};
+var UWGT={mg:1e-6,g:0.001,kg:1,t:1000,oz:0.0283495,lb:0.453592,st:6.35029};
+var USPD={"m/s":1,"km/h":0.277778,mph:0.44704,kn:0.514444,"ft/s":0.3048};
+var UAREA={"mm²":1e-6,"cm²":1e-4,"m²":1,"km²":1e6,"in²":6.4516e-4,"ft²":0.092903,acre:4046.86,ha:10000};
+var UVOL={ml:0.001,L:1,"m³":1000,tsp:0.00492892,tbsp:0.0147868,cup:0.236588,pt:0.473176,qt:0.946353,gal:3.78541};
+var UDATA={bit:0.125,B:1,KB:1024,MB:1048576,GB:1073741824,TB:1099511627776};
+var UTIME={ms:0.001,s:1,min:60,h:3600,d:86400,wk:604800};
+var UANG={deg:1,rad:57.29578,grad:0.9,turn:360};
+var UPRES={Pa:1,kPa:1000,bar:1e5,atm:101325,psi:6894.76,mmHg:133.322};
+var UENE={J:1,kJ:1000,cal:4.184,kcal:4184,Wh:3600,kWh:3.6e6,BTU:1055.06};
+var UPWR={W:1,kW:1000,hp:745.7,"BTU/h":293.071,PS:735.499};
+IMPL["Unit Converter"]=function(box){
+ var groups={Length:ULEN,Weight:UWGT,Speed:USPD,Area:UAREA,Volume:UVOL,Data:UDATA,Time:UTIME,Angle:UANG,Pressure:UPRES,Energy:UENE,Power:UPWR};
+ box.innerHTML='<label class="lb">CATEGORY</label><select class="fin" id="f_g" onchange="ucUpd()">'+Object.keys(groups).map(function(g){return '<option>'+g+"</option>"}).join("")+"</select>"+convUI([]);
+ window.UCG=groups;CONVTAB=ULEN;ucUpd();
+};
+function ucUpd(){var u=Object.keys(UCG[$("f_g").value]),o=u.map(function(x){return '<option>'+x+"</option>"}).join("");$("f_from").innerHTML=o;$("f_to").innerHTML=o;$("f_to").selectedIndex=1;CONVTAB=UCG[$("f_g").value]}
+regConv("Length Converter",ULEN);regConv("Weight Converter",UWGT);regConv("Speed Converter",USPD);regConv("Area Converter",UAREA);regConv("Volume Converter",UVOL);regConv("Data Size",UDATA);regConv("Time Converter",UTIME);regConv("Angle Converter",UANG);regConv("Pressure Converter",UPRES);regConv("Energy Converter",UENE);regConv("Power Converter",UPWR);
+IMPL["Temperature"]=function(box){box.innerHTML=convUI(["°C","°F","K"]);CONVTAB=null};
+IMPL["Fuel Economy"]=function(box){box.innerHTML='<label class="lb">VALUE</label><input class="fin" id="f_v" type="number" value="8"/><label class="lb">FROM</label><select class="fin" id="f_a"><option>L/100km</option><option>km/L</option><option>mpg</option><option>mi/L</option></select><label class="lb">TO</label><select class="fin" id="f_b"><option>km/L</option><option>L/100km</option><option>mpg</option><option>mi/L</option></select><button class="btn" onclick="feGo()">CONVERT</button><div class="out" id="feout" style="display:none"></div>'};
+function feGo(){var v=num($("f_v").value),a=$("f_a").value,b=$("f_b").value,kml;if(a==="L/100km")kml=100/v;else if(a==="km/L")kml=v;else if(a==="mpg")kml=v*0.425144;else kml=v*0.621371;var r;if(b==="km/L")r=kml;else if(b==="L/100km")r=100/kml;else if(b==="mpg")r=kml/0.425144;else r=kml*1.60934;$("feout").style.display="block";$("feout").innerHTML=fmt(v)+" <b>"+a+"</b> = <b>"+fmt(r)+"</b> "+b}
+IMPL["Shoe Size"]=function(box){box.innerHTML='<label class="lb">EU SIZE</label><select class="fin" id="f_s">'+[35,36,37,38,39,40,41,42,43,44,45,46].map(function(e){return '<option>'+e+"</option>"}).join("")+'</select><button class="btn" onclick="ssGo()">CONVERT</button><div class="out" id="ssout" style="display:none"></div>'};
+function ssGo(){var eu=+$("f_s").value;var usm=eu-33,usw=usm+1,uk=usm+0.5,cm=(eu+1.5)*0.6667;$("ssout").style.display="block";$("ssout").innerHTML="EU <b>"+eu+"</b> · US Men <b>"+usm+"</b> · US Women <b>"+usw+"</b> · UK <b>"+uk+"</b> · Foot <b>"+r2(cm)+" cm</b>"}
+IMPL["Clothing Size"]=function(box){box.innerHTML='<label class="lb">CHEST (CM)</label><input class="fin" id="f_c" type="number" value="96"/><button class="btn" onclick="csGo()">CONVERT</button><div class="out" id="csout" style="display:none"></div>'};
+function csGo(){var c=num($("f_c").value);var s=c<86?"XS":c<94?"S":c<102?"M":c<110?"L":c<118?"XL":"XXL";var eu=c<86?"42":c<94?"46":c<102?"50":c<110?"54":c<118?"58":"62";var us=c<86?"32":c<94?"36":c<102?"40":c<110?"44":c<118?"48":"52";$("csout").style.display="block";$("csout").innerHTML="Intl <b>"+s+"</b> · EU <b>"+eu+"</b> · US <b>"+us+"</b>"}
+regIO("Roman Numerals",function(v){
+ v=v.trim().toUpperCase();
+ if(/^[0-9]+$/.test(v)){var n=+v;if(n<1||n>3999)throw new Error("1–3999 only");var map=[[1000,"M"],[900,"CM"],[500,"D"],[400,"CD"],[100,"C"],[90,"XC"],[50,"L"],[40,"XL"],[10,"X"],[9,"IX"],[5,"V"],[4,"IV"],[1,"I"]],o="";map.forEach(function(m){while(n>=m[0]){o+=m[1];n-=m[0]}});return o}
+ if(/^[MDCLXVI]+$/.test(v)){var val={M:1000,D:500,C:100,L:50,X:10,V:5,I:1},n=0;for(var i=0;i<v.length;i++){var a=val[v[i]],b=val[v[i+1]]||0;if(a<b){n+=b-a;i++}else n+=a}return n}
+ throw new Error("Enter a number or roman numeral");
+});
+regForm("Number Base",[["v","VALUE","text","255"],["a","FROM BASE","sel",["2","8","10","16"]],["b","TO BASE","sel",["2","8","10","16"]]],function(v){var n=parseInt(v.v.trim(),+v.a);if(isNaN(n))throw new Error("Invalid for base "+v.a);return v.v+" (base "+v.a+") = <b>"+n.toString(+v.b).toUpperCase()+"</b> (base "+v.b+")"});
+regIO("Timestamp Converter",function(v){
+ v=v.trim();
+ if(/^[0-9]+$/.test(v)){var n=+v;if(v.length>11)n=Math.floor(n/1000);var d=new Date(n*1000);return d.toLocaleString()+"\nISO: "+d.toISOString()}
+ var t=Date.parse(v);if(isNaN(t))throw new Error("Enter a timestamp or date");return "Seconds: "+Math.floor(t/1000)+"\nMillis: "+t+"\n"+new Date(t).toLocaleString();
+});
+IMPL["Timezone Converter"]=function(box){
+ var zs=["Asia/Yangon","Asia/Bangkok","Asia/Tokyo","Asia/Dubai","Europe/London","Europe/Paris","America/New_York","America/Los_Angeles","Australia/Sydney","UTC"];
+ box.innerHTML='<label class="lb">DATE & TIME</label><input class="fin" id="f_dt" type="datetime-local"/><label class="lb">ZONE</label><select class="fin" id="f_z">'+zs.map(function(z){return "<option>"+z+"</option>"}).join("")+'</select><button class="btn" onclick="tzGo()">CONVERT</button><div class="out" id="tzout" style="display:none"></div>';
+ var d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+ $("f_dt").value=d.toISOString().slice(0,16);
+};
+function tzGo(){var dt=$("f_dt").value,z=$("f_z").value;$("tzout").style.display="block";var h="";var zones=["Asia/Yangon","Asia/Tokyo","Europe/London","Europe/Paris","America/New_York","America/Los_Angeles","Australia/Sydney","UTC"];try{var inf=new Intl.DateTimeFormat("en-US",{timeZone:z,dateStyle:"short",timeStyle:"short"}).format(new Date(dt));h+="Interpreted in <b>"+z+"</b>: "+inf+"\n\nSame moment worldwide:\n";zones.forEach(function(zt){h+=new Intl.DateTimeFormat("en-US",{timeZone:zt,dateStyle:"medium",timeStyle:"short"}).format(new Date(dt))+" — "+zt+"\n"})}catch(e){h="Not supported on this device"}$("tzout").innerHTML=h}
+IMPL["Currency Rates"]=function(box){box.innerHTML='<label class="lb">AMOUNT (USD)</label><input class="fin" id="f_a" type="number" value="1"/><button class="btn" onclick="crGo()">💱 LOAD LIVE RATES</button><div class="out" id="crout" style="display:none">Loading...</div>';crGo()};
+function crGo(){
+ $("crout").style.display="block";
+ fetch("https://open.er-api.com/v6/latest/USD").then(function(r){return r.json()}).then(function(j){
+  if(j.result!=="success")throw new Error("API error");
+  var amt=+$("f_a").value||1,cs=["MMK","EUR","THB","SGD","JPY","CNY","GBP","INR","AUD","KRW"];
+  var h="Updated: "+j.time_last_update_utc+"\n\n";
+  cs.forEach(function(c){h+=fmt(amt)+" USD = <b>"+fmt(amt*j.rates[c])+"</b> "+c+"\n"});
+  $("crout").innerHTML=h;
+ }).catch(function(e){$("crout").textContent="Offline — live rates need internet: "+e.message});
+}
+var MORS={A:".-",B:"-...",C:"-.-.",D:"-..",E:".",F:"..-.",G:"--.",H:"....",I:"..",J:".---",K:"-.-",L:".-..",M:"--",N:"-.",O:"---",P:".--.",Q:"--.-",R:".-.",S:"...",T:"-",U:"..-",V:"...-",W:".--",X:"-..-",Y:"-.--",Z:"--..","0":"-----","1":".----","2":"..---","3":"...--","4":"....-","5":".....","6":"-....","7":"--...","8":"---..","9":"----.",".":".-.-.-",",":"--..--","?":"..--..","/":"-..-.","@":".--.-."};
+var MORS2={};Object.keys(MORS).forEach(function(k){MORS2[MORS[k]]=k});
+regIO("Morse Code",function(v){
+ if(/^[.-]+(\s[.-]+)*$/.test(v.trim()))return v.trim().split(/\s+/).map(function(c){return MORS2[c]||"?"}).join("");
+ return v.toUpperCase().split("").map(function(c){return MORS[c]||""}).filter(Boolean).join(" ");
+});
+regIO("Text → Binary",function(v){return strBytes(v).map(function(b){var s=b.toString(2);while(s.length<8)s="0"+s;return s}).join(" ")});
+regIO("Binary → Text",function(v){return v.trim().split(/\s+/).map(function(b){return String.fromCharCode(parseInt(b,2))}).join("")});
+regIO("Text → Hex",function(v){return strBytes(v).map(function(b){return (b<16?"0":"")+b.toString(16)}).join(" ")});
+/* ============ CALCULATORS ============ */
+function calcUI(keys){return '<div class="disp" id="cd"></div><div class="pad">'+keys.map(function(k){return '<button onclick="cdPress(\''+k+'\')">'+esc(k)+"</button>"}).join("")+"</div>"}
+IMPL["Basic Calculator"]=function(box){box.innerHTML=calcUI(["7","8","9","÷","4","5","6","×","1","2","3","-","0",".","="","+","C","(",")","%"])};
+IMPL["Scientific Calculator"]=function(box){box.innerHTML=calcUI(["sin","cos","tan","÷","ln","log","sqrt","×","^","(",")","-","7","8","9","+","4","5","6",".","1","2","3","=","0","C","pi","%"])};
+function cdPress(k){
+ var d=$("cd");
+ if(k==="C")d.textContent="";
+ else if(k==="="){try{d.textContent=evalExpr(d.textContent)}catch(e){d.textContent="Error"}}
+ else if(k==="pi")d.textContent+="pi";
+ else d.textContent+=k;
+}
+regForm("Age Calculator",[["d","DATE OF BIRTH","date",""]],function(v){
+ if(!v.d)throw new Error("Pick a date");
+ var b=new Date(v.d),n=new Date();
+ if(b>n)throw new Error("Born in the future?");
+ var y=n.getFullYear()-b.getFullYear(),m=n.getMonth()-b.getMonth(),d=n.getDate()-b.getDate();
+ if(d<0){m--;d+=30}if(m<0){y--;m+=12}
+ var days=Math.floor((n-b)/86400000);
+ var nb=new Date(n.getFullYear(),b.getMonth(),b.getDate());if(nb<n)nb.setFullYear(nb.getFullYear()+1);
+ return "Age: <b>"+y+"y "+m+"m "+d+"d</b>\nDays lived: <b>"+days.toLocaleString()+"</b>\nNext birthday in: <b>"+Math.ceil((nb-n)/86400000)+" days</b>";
+});
+regForm("BMI Calculator",[["w","WEIGHT (KG)","number","60"],["h","HEIGHT (CM)","number","170"]],function(v){
+ var b=num(v.w)/Math.pow(num(v.h)/100,2);
+ var c=b<18.5?"Underweight":b<25?"Normal":b<30?"Overweight":"Obese";
+ return "BMI: <b>"+r2(b)+"</b> — "+c+"\nHealthy range for your height: <b>"+r2(18.5*Math.pow(num(v.h)/100,2))+"–"+r2(24.9*Math.pow(num(v.h)/100,2))+"</b> kg";
+});
+regForm("Loan / EMI",[["p","LOAN AMOUNT","number","100000"],["r","ANNUAL RATE (%)","number","8"],["n","MONTHS","number","60"]],function(v){
+ var P=num(v.p),r=num(v.r)/1200,n=num(v.n);
+ var emi=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+ return "Monthly EMI: <b>"+fmt(emi)+"</b>\nTotal payment: <b>"+fmt(emi*n)+"</b>\nTotal interest: <b>"+fmt(emi*n-P)+"</b>";
+});
+regForm("Compound Interest",[["p","PRINCIPAL","number","1000"],["r","RATE (%)","number","6"],["y","YEARS","number","5"],["n","COMPOUNDS / YEAR","number","12"]],function(v){
+ var A=num(v.p)*Math.pow(1+num(v.r)/100/num(v.n),num(v.n)*num(v.y));
+ return "Final amount: <b>"+fmt(A)+"</b>\nInterest earned: <b>"+fmt(A-num(v.p))+"</b>";
+});
+regForm("Discount Calculator",[["p","PRICE","number","50000"],["d","DISCOUNT (%)","number","20"]],function(v){var p=num(v.p),d=num(v.d);return "You save: <b>"+fmt(p*d/100)+"</b>\nFinal price: <b>"+fmt(p-p*d/100)+"</b>"});
+IMPL["Percentage Calc"]=function(box){box.innerHTML='<label class="lb">MODE</label><select class="fin" id="f_m"><option>X% of Y</option><option>X is what % of Y</option><option>% change X → Y</option></select><label class="lb">X</label><input class="fin" id="f_x" type="number" value="25"/><label class="lb">Y</label><input class="fin" id="f_y" type="number" value="200"/><button class="btn" onclick="pctGo()">CALCULATE</button><div class="out" id="pout" style="display:none"></div>'};
+function pctGo(){var x=num($("f_x").value),y=num($("f_y").value),m=$("f_m").value,r;m==="X% of Y"?r=fmt(x/100*y):m==="X is what % of Y"?r=r2(x/y*100)+"%":r=r2((y-x)/x*100)+"%";$("pout").style.display="block";$("pout").textContent="Result: "+r}
+regForm("GST / VAT",[["a","AMOUNT","number","10000"],["r","RATE (%)","number","5"],["m","MODE","sel",["Add tax to amount","Extract tax from amount"]]],function(v){
+ var a=num(v.a),r=num(v.r)/100;
+ if(v.m==="Add tax to amount")return "Tax: <b>"+fmt(a*r)+"</b>\nTotal: <b>"+fmt(a+a*r)+"</b>";
+ return "Tax included: <b>"+fmt(a-a/(1+r))+"</b>\nNet amount: <b>"+fmt(a/(1+r))+"</b>";
+});
+regForm("Tip Calculator",[["b","BILL","number","20000"],["t","TIP (%)","number","10"],["p","PEOPLE","number","1"]],function(v){
+ var b=num(v.b),tip=b*num(v.t)/100,p=Math.max(1,num(v.p));
+ return "Tip: <b>"+fmt(tip)+"</b>\nTotal: <b>"+fmt(b+tip)+"</b>\nPer person: <b>"+fmt((b+tip)/p)+"</b>";
+});
+regForm("Date Difference",[["a","FROM","date",""],["b","TO","date",""]],function(v){
+ if(!v.a||!v.b)throw new Error("Pick both dates");
+ var ms=new Date(v.b)-new Date(v.a),d=Math.floor(Math.abs(ms)/86400000);
+ return "Difference: <b>"+d.toLocaleString()+" days</b>\n≈ "+r2(d/7)+" weeks · ≈ "+r2(d/30.44)+" months · ≈ "+r2(d/365.25)+" years";
+});
+regForm("Date Add / Sub",[["d","DATE","date",""],["n","DAYS (+/-)","number","30"]],function(v){
+ if(!v.d)throw new Error("Pick a date");
+ var dt=new Date(v.d);dt.setDate(dt.getDate()+Math.round(num(v.n)));
+ return "Result: <b>"+dt.toDateString()+"</b>";
+});
+IMPL["Time Calculator"]=function(box){box.innerHTML='<label class="lb">TIME A (HH:MM)</label><input class="fin" id="f_a" value="02:30"/><label class="lb">TIME B (HH:MM)</label><input class="fin" id="f_b" value="01:45"/><label class="lb">OPERATION</label><select class="fin" id="f_o"><option>A + B</option><option>A − B</option></select><button class="btn" onclick="tcalcGo()">CALCULATE</button><div class="out" id="tcout" style="display:none"></div>'};
+function tcalcGo(){
+ function m(s){var p=s.split(":");return +p[0]*60+(+p[1]||0)}
+ function f(min){min=((min%1440)+1440)%1440;var h=Math.floor(min/60),mm=min%60;return (h<10?"0":"")+h+":"+(mm<10?"0":"")+mm}
+ var a=m($("f_a").value),b=m($("f_b").value),o=$("f_o").value;
+ var r=o==="A + B"?a+b:a-b;
+ $("tcout").style.display="block";$("tcout").textContent=o+" = "+f(r)+" ("+r+" minutes)";
+}
+regForm("Fuel Cost",[["d","DISTANCE (KM)","number","500"],["f","CONSUMPTION (L/100KM)","number","8"],["p","PRICE / L","number","2500"]],function(v){var d=num(v.d),f=num(v.f)/100,p=num(v.p);return "Fuel needed: <b>"+r2(d*f)+" L</b>\nTotal cost: <b>"+fmt(d*f*p)+"</b>"});
+regForm("Salary Calculator",[["h","HOURS / WEEK","number","40"],["r","RATE / HOUR","number","10"]],function(v){var h=num(v.h),r=num(v.r);return "Weekly: <b>"+fmt(h*r)+"</b>\nMonthly (4.33 wks): <b>"+fmt(h*r*4.33)+"</b>\nYearly: <b>"+fmt(h*r*52)+"</b>"});
+regForm("Income Tax",[["i","INCOME / YEAR","number","12000000"],["r","FLAT TAX RATE (%)","number","0"]],function(v){
+ var i=num(v.i),r=num(v.r)/100,t=i*r;
+ return "Estimated tax: <b>"+fmt(t)+"</b>\nNet income: <b>"+fmt(i-t)+"</b>\n(after deductions: consult local rules)";
+});
+regForm("Bill Split",[["t","TOTAL BILL","number","60000"],["p","PEOPLE","number","4"],["tip","TIP (%)","number","0"]],function(v){
+ var t=num(v.t)*(1+num(v.tip)/100),p=Math.max(1,num(v.p));
+ return "Grand total: <b>"+fmt(t)+"</b>\nPer person: <b>"+fmt(t/p)+"</b>";
+});
+regForm("Ratio Calculator",[["a","A","number","3"],["b","B","number","4"],["c","C (to solve D)","text","10"]],function(v){
+ var a=num(v.a),b=num(v.b);
+ if(v.c.trim()){var c=num(v.c);return "A:B = C:D → D = <b>"+r2(b*c/a)+"</b>"}
+ return "Ratios equivalent to "+a+":"+b+":\n"+[1,2,3,4,5,10,20].map(function(k){return (a*k)+":"+(b*k)}).join("  ");
+});
+IMPL["Fraction Calc"]=function(box){box.innerHTML='<label class="lb">FRACTION A (e.g. 3/4)</label><input class="fin" id="f_a" value="3/4"/><label class="lb">OPERATION</label><select class="fin" id="f_o"><option>+</option><option>−</option><option>×</option><option>÷</option></select><label class="lb">FRACTION B</label><input class="fin" id="f_b" value="1/2"/><button class="btn" onclick="frGo()">CALCULATE</button><div class="out" id="frout" style="display:none"></div>'};
+function frGo(){
+ function pf(s){var p=s.split("/");return [p.length>1?+p[1]:1,+p[0]]}
+ var a=pf($("f_a").value),b=pf($("f_b").value),o=$("f_o").value,r;
+ if(o==="+")r=[a[0]*b[1]+b[0]*a[1],a[1]*b[1]];
+ else if(o==="−")r=[a[0]*b[1]-b[0]*a[1],a[1]*b[1]];
+ else if(o==="×")r=[a[0]*b[0],a[1]*b[1]];
+ else r=[a[0]*b[1],a[1]*b[0]];
+ function gcd(x,y){return y?gcd(y,x%y):x}
+ var g=gcd(Math.abs(r[0]),Math.abs(r[1]))||1;
+ r[0]/=g;r[1]/=g;
+ $("frout").style.display="block";$("frout").innerHTML="Result: <b>"+r[0]+"/"+r[1]+"</b> = "+r2(r[0]/r[1]);
+}
+regForm("Random Number",[["a","MIN","number","1"],["b","MAX","number","100"],["n","HOW MANY","number","1"]],function(v){
+ var a=num(v.a),b=num(v.b),n=Math.min(50,Math.max(1,Math.round(num(v.n)))),o=[];
+ for(var i=0;i<n;i++)o.push(Math.floor(a+Math.random()*(b-a+1)));
+ return o.join(", ");
+});
+regForm("Matrix Calculator",[["a","A","number","4"],["b","B","number","3"],["c","C","number","2"],["d","D","number","1"]],function(v){
+ var a=num(v.a),b=num(v.b),c=num(v.c),d=num(v.d),det=a*d-b*c;
+ var h="Matrix: [[<b>"+a+"</b>,<b>"+b+"</b>],[<b>"+c+"</b>,<b>"+d+"</b>]]\n";
+ h+="Determinant: <b>"+det+"</b>\nTrace: <b>"+(a+d)+"</b>";
+ if(det!==0)h+="\nInverse: [["+r2(d/det)+", "+r2(-b/det)+"], ["+r2(-c/det)+", "+r2(a/det)+"]]";
+ return h;
+});
+regForm("Quadratic Solver",[["a","A","number","1"],["b","B","number","-3"],["c","C","number","2"]],function(v){
+ var a=num(v.a),b=num(v.b),c=num(v.c),d=b*b-4*a*c;
+ if(a===0)throw new Error("A cannot be 0");
+ if(d<0)return "Discriminant <b>"+d+"</b> — complex roots: x = <b>"+r2(-b/(2*a))+" ± "+r2(Math.sqrt(-d)/(2*a))+"i</b>";
+ return "Roots: x1 = <b>"+r2((-b+Math.sqrt(d))/(2*a))+"</b>, x2 = <b>"+r2((-b-Math.sqrt(d))/(2*a))+"</b>";
+});
+IMPL["Statistics Calc"]=function(box){box.innerHTML=ioUI("Enter numbers separated by space or comma...","ANALYZE");IOFN=function(v){
+ var ns=v.trim().split(/[\s,]+/).map(Number).filter(function(x){return !isNaN(x)});
+ if(!ns.length)throw new Error("Enter numbers");
+ var sum=ns.reduce(function(a,b){return a+b},0),mean=sum/ns.length;
+ var s=ns.slice().sort(function(a,b){return a-b}),med=s.length%2?s[(s.length-1)/2]:(s[s.length/2-1]+s[s.length/2])/2;
+ var sd=Math.sqrt(ns.reduce(function(a,b){return a+(b-mean)*(b-mean)},0)/ns.length);
+ var counts={},mode="?";var best=0;
+ ns.forEach(function(n){counts[n]=(counts[n]||0)+1;if(counts[n]>best){best=counts[n];mode=n}});
+ return "Count: "+ns.length+"\nSum: "+fmt(sum)+"\nMean: "+r2(mean)+"\nMedian: "+med+"\nMode: "+mode+" (×"+best+")\nStd dev: "+r2(sd)+"\nMin: "+s[0]+" · Max: "+s[s.length-1];
+}};
+regForm("Prime Checker",[["n","NUMBER","number","97"]],function(v){
+ var n=Math.round(num(v.n));if(n<2)return n+" is not prime";
+ for(var i=2;i*i<=n;i++)if(n%i===0)return n+" = <b>"+i+"×"+(n/i)+"</b> — not prime";
+ return n+" is <b>PRIME ✔</b>";
+});
+regForm("Number Series",[["n","N","number","10"]],function(v){
+ var n=Math.round(num(v.n));if(n<1||n>170)throw new Error("1–170");
+ var sum=0;for(var i=1;i<=n;i++)sum+=i;
+ var f=[0,1];for(i=2;i<=n;i++)f.push(f[i-1]+f[i-2]);
+ var fact=1;for(i=2;i<=n;i++)fact*=i;
+ return "Sum 1.."+n+": <b>"+sum+"</b>\nTriangular: <b>"+(n*(n+1)/2)+"</b>\n"+n+"! = <b>"+(n<=20?fact.toLocaleString():fact.toExponential(4))+"</b>\nFibonacci F"+n+": <b>"+f[n]+"</b>";
+});
+/* ============ NETWORK ============ */
+IMPL["My IP Address"]=function(box){box.innerHTML='<button class="btn" onclick="ipGo()">🌐 CHECK MY IP</button><div class="out" id="ipout" style="display:none">Loading...</div>'};
+function ipGo(){$("ipout").style.display="block";fetch("https://api.ipify.org?format=json").then(function(r){return r.json()}).then(function(j){$("ipout").innerHTML="Your public IP: <b>"+esc(j.ip)+"</b>"}).catch(function(){$("ipout").textContent="No internet connection"})}
+IMPL["IP Lookup"]=function(box){box.innerHTML='<label class="lb">IP ADDRESS</label><input class="fin" id="f_ip" placeholder="8.8.8.8"/><button class="btn" onclick="iplGo()">LOOKUP</button><div class="out" id="iplout" style="display:none"></div>'};
+function iplGo(){
+ var ip=$("f_ip").value.trim();$("iplout").style.display="block";
+ fetch("https://ipwho.is/"+ip).then(function(r){return r.json()}).then(function(j){
+  if(j.success===false)throw new Error(j.message||"Not found");
+  $("iplout").innerHTML="IP: <b>"+esc(j.ip)+"</b>\nCountry: <b>"+esc(j.country)+"</b>\nCity: <b>"+esc(j.city||"-")+"</b>\nRegion: "+esc(j.region||"-")+"\nISP: "+esc(j.connection&&j.connection.isp?j.connection.isp:"-")+"\nCoords: <b>"+(j.latitude||"-")+", "+(j.longitude||"-")+"</b>\nTimezone: "+esc(j.timezone?j.timezone.id:"-");
+ }).catch(function(e){$("iplout").textContent="Lookup failed: "+e.message});
+}
+IMPL["DNS Lookup"]=function(box){box.innerHTML='<label class="lb">DOMAIN</label><input class="fin" id="f_d" value="google.com"/><label class="lb">TYPE</label><select class="fin" id="f_t"><option>A</option><option>AAAA</option><option>TXT</option><option>CNAME</option><option>MX</option></select><button class="btn" onclick="dnsGo()">LOOKUP</button><div class="out" id="dnsout" style="display:none"></div>'};
+function dnsGo(){
+ var d=$("f_d").value.trim(),t=$("f_t").value;$("dnsout").style.display="block";
+ fetch("https://dns.google/resolve?name="+encodeURIComponent(d)+"&type="+t).then(function(r){return r.json()}).then(function(j){
+  var h="DNS "+t+" for <b>"+esc(d)+"</b>:\n";
+  (j.Answer||[]).forEach(function(a){h+=a.data+"\n"});
+  if(!j.Answer)h+="No records found";
+  $("dnsout").innerHTML=h;
+ }).catch(function(){$("dnsout").textContent="Needs internet connection"});
+}
+IMPL["MX Record Lookup"]=function(box){box.innerHTML='<label class="lb">DOMAIN</label><input class="fin" id="f_d" value="gmail.com"/><button class="btn" onclick="mxGo()">LOOKUP MX</button><div class="out" id="mxout" style="display:none"></div>'};
+function mxGo(){var d=$("f_d").value.trim();$("mxout").style.display="block";fetch("https://dns.google/resolve?name="+encodeURIComponent(d)+"&type=MX").then(function(r){return r.json()}).then(function(j){var h="MX records for <b>"+esc(d)+"</b>:\n";(j.Answer||[]).forEach(function(a){h+=a.data+"\n"});if(!j.Answer)h+="No MX records";$("mxout").innerHTML=h}).catch(function(){$("mxout").textContent="Needs internet"})}
+IMPL["Ping Tool"]=function(box){box.innerHTML='<label class="lb">HOST (e.g. google.com)</label><input class="fin" id="f_h" value="google.com"/><button class="btn" onclick="pingGo()">PING</button><div class="out" id="pingout" style="display:none"></div>'};
+function pingGo(){
+ var h=$("f_h").value.trim();$("pingout").style.display="block";$("pingout").textContent="Pinging https://"+h+" ...";
+ var t0=Date.now();
+ fetch("https://"+h,{mode:"no-cors",cache:"no-store"}).then(function(){var ms=Date.now()-t0;$("pingout").innerHTML="Reply from <b>"+esc(h)+"</b> — round trip ≈ <b>"+ms+" ms</b> (HTTPS web ping)"})
+ .catch(function(){$("pingout").textContent="Ping failed — host unreachable or offline"});
+}
+IMPL["Speed Test"]=function(box){box.innerHTML='<button class="btn" onclick="stGo()">⚡ START SPEED TEST</button><div class="out" id="stout" style="display:none"></div>'};
+function stGo(){
+ $("stout").style.display="block";$("stout").textContent="Testing download speed...";
+ var t0=Date.now(),bytes=10000000;
+ fetch("https://speed.cloudflare.com/__down?bytes="+bytes,{cache:"no-store"}).then(function(r){return r.blob()}).then(function(b){
+  var s=(Date.now()-t0)/1000,mbps=b.size*8/1e6/s;
+  $("stout").innerHTML="Download: <b>"+r2(mbps)+" Mbps</b>\nDownloaded "+(b.size/1e6).toFixed(1)+" MB in "+r2(s)+"s\n(Server: Cloudflare)";
+ }).catch(function(){$("stout").textContent="Speed test needs internet"});
+}
+IMPL["Subnet Calculator"]=function(box){box.innerHTML='<label class="lb">IP ADDRESS</label><input class="fin" id="f_i" value="192.168.1.10"/><label class="lb">CIDR PREFIX</label><select class="fin" id="f_c">'+[8,16,24,25,26,28,30,32].sort(function(a,b){return a-b}).map(function(n){return '<option'+(n===24?" selected":"")+'>'+n+"</option>"}).join("")+'</select><button class="btn" onclick="subGo()">CALCULATE</button><div class="out" id="subout" style="display:none"></div>'};
+function subGo(){
+ var ip=$("f_i").value.split(".").map(Number),c=+$("f_c").value;
+ if(ip.length!==4||ip.some(function(o){return isNaN(o)||o<0||o>255}))throw new Error("Bad IP");
+ var mask=c===0?0:(0xFFFFFFFF<<(32-c))>>>0;
+ var ipn=(ip[0]<<24|ip[1]<<16|ip[2]<<8|ip[3])>>>0;
+ var net=(ipn&mask)>>>0,bc=((ipn&mask)|(~mask>>>0))>>>0;
+ function s(n){return [(n>>>24),(n>>>16&255),(n>>>8&255),(n&255)].join(".")}
+ $("subout").style.display="block";
+ $("subout").innerHTML="Network: <b>"+s(net)+"</b>\nBroadcast: <b>"+s(bc)+"</b>\nSubnet mask: <b>"+s(mask)+"</b>\nHosts: <b>"+Math.max(0,Math.pow(2,32-c)-2)+"</b>";
+}
+IMPL["Geo IP Map"]=function(box){box.innerHTML='<label class="lb">IP ADDRESS</label><input class="fin" id="f_ip" placeholder="8.8.8.8"/><button class="btn" onclick="geoGo()">LOCATE</button><div class="out" id="geoout" style="display:none"></div>'};
+function geoGo(){
+ var ip=$("f_ip").value.trim();$("geoout").style.display="block";
+ fetch("https://ipwho.is/"+ip).then(function(r){return r.json()}).then(function(j){
+  if(j.success===false)throw new Error("Not found");
+  $("geoout").innerHTML="Location: <b>"+esc(j.city||"?")+", "+esc(j.country||"?")+"</b>\nCoords: <b>"+j.latitude+", "+j.longitude+"</b>\nMap: https://www.openstreetmap.org/?mlat="+j.latitude+"&mlon="+j.longitude+"#map=11/"+j.latitude+"/"+j.longitude;
+ }).catch(function(){$("geoout").textContent="Needs internet"});
+}
+IMPL["Email Validator"]=function(box){box.innerHTML=ioUI("Enter email address...","VALIDATE");IOFN=function(v){
+ var ok=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+ return ok?"✔ "+v.trim()+" looks valid":"✘ Invalid email format";
+}};
+regIO("URL Encoder",function(v){return encodeURIComponent(v)});
+regIO("URL Decoder",function(v){return decodeURIComponent(v)});
+regForm("Bandwidth Calc",[["mb","FILE SIZE (MB)","number","700"],["s","TIME (SECONDS)","number","60"]],function(v){var mb=num(v.mb),s=Math.max(0.001,num(v.s));return "Speed: <b>"+r2(mb*8/s)+" Mbps</b> ("+r2(mb/s)+" MB/s)"});
+IMPL["DNS Propagation"]=function(box){box.innerHTML='<label class="lb">DOMAIN</label><input class="fin" id="f_d" value="example.com"/><button class="btn" onclick="dpGo()">CHECK</button><div class="out" id="dpout" style="display:none"></div>'};
+function dpGo(){var d=$("f_d").value.trim();$("dpout").style.display="block";var types=["A","AAAA","TXT","MX","CNAME"],done=0,h="";types.forEach(function(t){fetch("https://dns.google/resolve?name="+encodeURIComponent(d)+"&type="+t).then(function(r){return r.json()}).then(function(j){h+="[<b>"+t+"</b>] "+((j.Answer||[]).map(function(a){return a.data}).join(" | ")||"—")+"\n"}).catch(function(){h+="[<b>"+t+"</b>] error\n"}).then(function(){done++;if(done===types.length)$("dpout").innerHTML=h})})}
+IMPL["HTTP Status Codes"]=function(box){
+ var codes={"200 OK":"Success","301 Moved Permanently":"Permanent redirect","400 Bad Request":"Client error","401 Unauthorized":"Auth required","403 Forbidden":"Access denied","404 Not Found":"Resource missing","429 Too Many Requests":"Rate limited","500 Internal Server Error":"Server error","502 Bad Gateway":"Invalid upstream response","503 Service Unavailable":"Server overloaded"};
+ box.innerHTML=Object.keys(codes).map(function(c){return '<div class="kv"><i>'+c+'</i><b>'+codes[c]+"</b></div>"}).join("");
+};
+/* ============ QR ============ */
+IMPL["QR Generator"]=function(box){qrUI(box)};
+IMPL["Text QR"]=function(box){qrUI(box)};
+IMPL["URL QR"]=function(box){qrUI(box,"https://")};
+IMPL["WiFi QR"]=function(box){box.innerHTML='<label class="lb">SSID (NETWORK NAME)</label><input class="fin" id="f_s" placeholder="MyWiFi"/><label class="lb">PASSWORD</label><input class="fin" id="f_p" type="password"/><button class="btn" onclick="wifiQr()">⚡ GENERATE WIFI QR</button><div id="qrres"></div>'};
+function wifiQr(){var s=$("f_s").value;if(!s){qrErr("Enter SSID");return}qrTextGo("WIFI:T:WPA;S:"+s+";P:"+$("f_p").value+";;",true)}
+IMPL["vCard QR"]=function(box){box.innerHTML='<label class="lb">NAME</label><input class="fin" id="f_n" placeholder="Ko Ko"/><label class="lb">PHONE</label><input class="fin" id="f_t" placeholder="+95 9xx"/><label class="lb">EMAIL</label><input class="fin" id="f_e" placeholder="name@mail.com"/><button class="btn" onclick="vcQr()">⚡ GENERATE VCARD QR</button><div id="qrres"></div>'};
+function vcQr(){var n=$("f_n").value;if(!n){qrErr("Enter name");return}qrTextGo("BEGIN:VCARD\nVERSION:3.0\nFN:"+n+"\nTEL:"+$("f_t").value+"\nEMAIL:"+$("f_e").value+"\nEND:VCARD",true)}
+IMPL["Email QR"]=function(box){box.innerHTML='<label class="lb">EMAIL</label><input class="fin" id="f_e" placeholder="name@mail.com"/><label class="lb">SUBJECT</label><input class="fin" id="f_s"/><label class="lb">BODY</label><textarea class="tin" id="f_b"></textarea><button class="btn" onclick="emQr()">⚡ GENERATE EMAIL QR</button><div id="qrres"></div>'};
+function emQr(){var e=$("f_e").value;if(!e){qrErr("Enter email");return}qrTextGo("mailto:"+e+"?subject="+encodeURIComponent($("f_s").value)+"&body="+encodeURIComponent($("f_b").value),true)}
+IMPL["SMS QR"]=function(box){box.innerHTML='<label class="lb">PHONE</label><input class="fin" id="f_p" placeholder="+95..."/><label class="lb">MESSAGE</label><textarea class="tin" id="f_m"></textarea><button class="btn" onclick="smQr()">⚡ GENERATE SMS QR</button><div id="qrres"></div>'};
+function smQr(){var p=$("f_p").value;if(!p){qrErr("Enter phone");return}qrTextGo("SMSTO:"+p+","+$("f_m").value,true)}
+IMPL["Phone QR"]=function(box){box.innerHTML='<label class="lb">PHONE NUMBER</label><input class="fin" id="f_p" placeholder="+95..."/><button class="btn" onclick="phQr()">⚡ GENERATE PHONE QR</button><div id="qrres"></div>'};
+function phQr(){var p=$("f_p").value;if(!p){qrErr("Enter phone");return}qrTextGo("tel:"+p,true)}
+IMPL["Event QR"]=function(box){box.innerHTML='<label class="lb">TITLE</label><input class="fin" id="f_t" placeholder="Meeting"/><label class="lb">LOCATION</label><input class="fin" id="f_l"/><label class="lb">START (YYYY-MM-DD HH:MM)</label><input class="fin" id="f_d" placeholder="2026-01-01 09:00"/><button class="btn" onclick="evQr()">⚡ GENERATE EVENT QR</button><div id="qrres"></div>'};
+function evQr(){var t=$("f_t").value;if(!t){qrErr("Enter title");return}qrTextGo("BEGIN:VEVENT\nSUMMARY:"+t+"\nLOCATION:"+$("f_l").value+"\nDTSTART:"+$("f_d").value.replace(/[-: ]/g,"")+"\nEND:VEVENT",true)}
+IMPL["Geo QR"]=function(box){box.innerHTML='<label class="lb">LATITUDE</label><input class="fin" id="f_la" value="16.8661"/><label class="lb">LONGITUDE</label><input class="fin" id="f_lo" value="96.1951"/><button class="btn" onclick="geoQr()">⚡ GENERATE GEO QR</button><div id="qrres"></div>'};
+function geoQr(){qrTextGo("geo:"+$("f_la").value+","+$("f_lo").value,true)}
+IMPL["Batch QR"]=function(box){box.innerHTML='<label class="lb">ONE TEXT PER LINE (MAX 8)</label><textarea class="tin" id="qrt" style="height:120px">Item 1
+Item 2
+Item 3</textarea><button class="btn" onclick="batchQr()">⚡ GENERATE ALL</button><div id="qrres"></div>'};
+function batchQr(){
+ var lines=$("qrt").value.split("\n").filter(function(l){return l.trim()}).slice(0,8);
+ var res=$("qrres");res.innerHTML="";
+ if(!lines.length){qrErr("Enter items");return}
+ lines.forEach(function(l){
+  try{var cv=qrCanvas(l,4);cv.className="qr";cv.style.display="block";cv.style.margin="10px auto";var p=document.createElement("p");p.style.cssText="text-align:center;font-size:11px;color:#8affd0";p.textContent=l;res.appendChild(p);res.appendChild(cv)}catch(e){}
+ });
+}
+IMPL["QR History"]=function(box){
+ var h=db("qrhist",[])||[];
+ box.innerHTML='<button class="btn" onclick="navTo(\'t/6/0\')" style="background:rgba(3,21,14,.9);color:#00ff9d;border:1px solid rgba(0,255,157,.4)">+ NEW QR</button><button class="btn" onclick="db(\'qrhist\',[]);render()" style="background:rgba(3,21,14,.9);color:#ffd700;border:1px solid rgba(255,215,0,.4)">🗑 CLEAR HISTORY</button>'+(h.length?h.map(function(t){return '<div class="out">'+esc(t)+"</div>"}).join(""):'<div class="pn" style="margin-top:14px"><p>No QR codes generated yet.</p></div>');
+};
+/* ============ DEVICE ============ */
+IMPL["Device Info"]=function(box){
+ var nav=navigator,h='<div class="kv"><i>Platform</i><b>'+esc(nav.platform)+"</b></div>";
+ h+='<div class="kv"><i>Language</i><b>'+esc(nav.language)+"</b></div>";
+ h+='<div class="kv"><i>Screen</i><b>'+screen.width+"×"+screen.height+" px · "+window.devicePixelRatio+"x</b></div>";
+ h+='<div class="kv"><i>CPU cores</i><b>'+(nav.hardwareConcurrency||"—")+"</b></div>";
+ h+='<div class="kv"><i>RAM (approx)</i><b>'+(nav.deviceMemory?nav.deviceMemory+" GB":"—")+"</b></div>";
+ h+='<div class="kv"><i>Online</i><b>'+(nav.onLine?"Yes ✔":"No")+"</b></div>";
+ h+='<div class="kv"><i>Touch points</i><b>'+(nav.maxTouchPoints||0)+"</b></div>";
+ h+='<div class="kv"><i>User agent</i><b>'+esc(nav.userAgent)+"</b></div>";
+ box.innerHTML=h;
+};
+IMPL["RAM Monitor"]=function(box){box.innerHTML='<div class="bigt">'+(navigator.deviceMemory?navigator.deviceMemory+" GB":"N/A")+'</div><small class="h">DEVICE MEMORY (APPROXIMATE)</small>'};
+IMPL["Storage Info"]=function(box){box.innerHTML='<div class="bigt" id="sto">...</div><small class="h">APP STORAGE ESTIMATE</small>';if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){$("sto").textContent=(e.usage/1048576).toFixed(1)+" MB used / "+(e.quota/1073741824).toFixed(2)+" GB quota"})else $("sto").textContent="N/A"};
+IMPL["Battery Status"]=function(box){box.innerHTML='<div class="bigt" id="bat">...</div><small class="h">BATTERY</small>';if(navigator.getBattery)navigator.getBattery().then(function(b){function up(){$("bat").textContent=Math.round(b.level*100)+"% "+(b.charging?"⚡":"")}up();b.onlevelchange=up;b.onchargingchange=up})else $("bat").textContent="N/A"};
+var SCR_COLORS=["#ff0000","#00ff00","#0000ff","#ffffff","#000000"];
+IMPL["Screen Test"]=IMPL["Dead Pixel Test"]=function(box){box.innerHTML='<p style="font-size:11px;color:#8affd0;margin-bottom:10px">Full-screen color cycles. Tap the screen to advance, long-press to exit.</p><button class="btn" onclick="scrGo()">▶ START TEST</button>'};
+function scrGo(){
+ var d=document.createElement("div");d.style.cssText="position:fixed;inset:0;z-index:200";var i=0;
+ d.onclick=function(){i++;if(i>SCR_COLORS.length){d.remove();return}d.style.background=SCR_COLORS[i-1];d.style.color="#fff";d.innerHTML='<p style="position:absolute;bottom:30px;left:0;right:0;text-align:center;font-size:10px;letter-spacing:.3em">TAP TO CONTINUE · LONG-PRESS TO EXIT</p>'};
+ d.oncontextmenu=function(){d.remove();return false};
+ document.body.appendChild(d);d.onclick();
+}
+IMPL["Touch Test"]=IMPL["Multi-Touch Test"]=function(box){
+ box.innerHTML='<canvas id="tcv" style="width:100%;height:300px;background:#031209;border:1px solid rgba(0,255,157,.3);border-radius:10px"></canvas><small class="h">TOUCH THE CANVAS — DOTS FOLLOW YOUR FINGERS</small>';
+ var cv=$("tcv");cv.width=cv.offsetWidth*2;cv.height=600;
+ var x=cv.getContext("2d");
+ function draw(e){
+  x.fillStyle="rgba(3,18,9,0.25)";x.fillRect(0,0,cv.width,cv.height);
+  var ts=e.touches;
+  for(var i=0;i<ts.length;i++){
+   x.beginPath();x.arc((ts[i].pageX-12)*2,(ts[i].pageY-140)*2,26,0,7);
+   x.fillStyle=i===0?"#00ff9d":"#ffd700";x.fill();
+  }
+ }
+ cv.addEventListener("touchstart",function(e){e.preventDefault();draw(e)});
+ cv.addEventListener("touchmove",function(e){e.preventDefault();draw(e)});
+};
+IMPL["Vibration Test"]=function(box){box.innerHTML='<button class="btn" onclick="navigator.vibrate(200)">📳 SHORT (200ms)</button><button class="btn" onclick="navigator.vibrate([100,50,100,50,300])" style="background:rgba(3,21,14,.9);color:#00ff9d;border:1px solid rgba(0,255,157,.4)">📳 PATTERN</button><button class="btn" onclick="navigator.vibrate(2000)" style="background:rgba(3,21,14,.9);color:#ffd700;border:1px solid rgba(255,215,0,.4)">📳 LONG (2s)</button><small class="h">IF NOTHING HAPPENS, THIS DEVICE BLOCKS VIBRATION</small>'};
+IMPL["Brightness Test"]=function(box){box.innerHTML='<button class="btn" onclick="var d=document.createElement(\'div\');d.style.cssText=\'position:fixed;inset:0;z-index:200;background:#fff\';d.onclick=function(){d.remove()};document.body.appendChild(d)">▶ WHITE SCREEN (TAP TO EXIT)</button>'};
+IMPL["Speaker Test"]=function(box){
+ box.innerHTML='<label class="lb">FREQUENCY: <span id="fq">440</span> HZ</label><input class="fin" id="f_f" type="range" min="100" max="8000" value="440"/><button class="btn" onclick="spkGo()">🔊 PLAY TONE (0.5s)</button><button class="btn" onclick="beep(1000,0.05,0.3)" style="background:rgba(3,21,14,.9);color:#00ff9d;border:1px solid rgba(0,255,157,.4)">SHORT BEEP</button>';
+ $("f_f").oninput=function(){$("fq").textContent=$("f_f").value};
+};
+function spkGo(){beep(+$("f_f").value,0.5,0.25)}
+/* ============ SECURITY ============ */
+IMPL["Password Generator"]=function(box){box.innerHTML='<label class="lb">LENGTH: <span id="pl">16</span></label><input class="fin" id="f_l" type="range" min="6" max="32" value="16"/><label class="lb">CHARACTER SET</label><select class="fin" id="f_s"><option>All</option><option>Letters + digits</option><option>Letters only</option><option>Digits only</option></select><button class="btn" onclick="pgGo()">🔐 GENERATE</button><div class="out" id="pgout" style="display:none"></div>';$("f_l").oninput=function(){$("pl").textContent=$("f_l").value}};
+function pgGo(){
+ var len=+$("f_l").value,mode=$("f_s").value,cs="abcdefghijklmnopqrstuvwxyz",CU="ABCDEFGHIJKLMNOPQRSTUVWXYZ",DI="0123456789",SY="!@#$%^&*()-_=+";
+ if(mode!=="Letters only"&&mode!=="Digits only")cs+=CU;
+ if(mode==="All"||mode==="Letters + digits")cs+=DI;
+ if(mode==="All")cs+=SY;
+ var arr=new Uint32Array(len);crypto.getRandomValues(arr);
+ var out="";for(var i=0;i<len;i++)out+=cs[arr[i]%cs.length];
+ $("pgout").style.display="block";$("pgout").innerHTML="<b>"+esc(out)+"</b>";
+}
+IMPL["PIN Generator"]=function(box){box.innerHTML='<label class="lb">DIGITS: <span id="pl">6</span></label><input class="fin" id="f_l" type="range" min="4" max="12" value="6"/><button class="btn" onclick="pinGo()">🔢 GENERATE PIN</button><div class="out" id="pgout" style="display:none"></div>';$("f_l").oninput=function(){$("pl").textContent=$("f_l").value}};
+function pinGo(){var len=+$("f_l").value,arr=new Uint32Array(len);crypto.getRandomValues(arr);var o="";for(var i=0;i<len;i++)o+=String(arr[i]%10);$("pgout").style.display="block";$("pgout").innerHTML="<b>"+o+"</b>"}
+var WORDS=["cyber","gold","green","matrix","pixel","vertex","quantum","photon","neon","logic","cipher","nova","orbit","delta","zephyr","iron","raven","tiger","lotus","onyx","storm","echo","falcon","lunar","nomad"];
+IMPL["Passphrase Generator"]=function(box){box.innerHTML='<label class="lb">WORDS: <span id="pl">4</span></label><input class="fin" id="f_l" type="range" min="3" max="6" value="4"/><button class="btn" onclick="pwGo()">🗝 GENERATE PASSPHRASE</button><div class="out" id="pgout" style="display:none"></div>';$("f_l").oninput=function(){$("pl").textContent=$("f_l").value}};
+function pwGo(){var n=+$("f_l").value,arr=new Uint32Array(n);crypto.getRandomValues(arr);var o=[];for(var i=0;i<n;i++)o.push(WORDS[arr[i]%WORDS.length]);$("pgout").style.display="block";$("pgout").innerHTML="<b>"+o.join("-")+"</b>"}
+IMPL["Password Strength"]=function(box){box.innerHTML=ioUI("Enter a password to test...","ANALYZE");IOFN=function(v){
+ if(!v.length)throw new Error("Enter a password");
+ var cs=0;if(/[a-z]/.test(v))cs+=26;if(/[A-Z]/.test(v))cs+=26;if(/[0-9]/.test(v))cs+=10;if(/[^a-zA-Z0-9]/.test(v))cs+=33;
+ var bits=v.length*Math.log2(cs),lvl=bits<40?"VERY WEAK":bits<60?"WEAK":bits<80?"GOOD":"STRONG";
+ var secs=Math.pow(2,bits)*0.5/1e9;
+ return "Entropy: <b>"+Math.round(bits)+" bits</b> — "+lvl+"\nEstimated brute force (10⁹ tries/s): "+(secs>3e9?(secs/3e9).toFixed(1)+" billion years":secs>1?secs.toFixed(1)+" seconds":"instant");
+}};
+regIO("SHA-256 Hash",function(v){return hex(sha256(strBytes(v)))});
+regIO("CRC32 Hash",function(v){var n=crc32(strBytes(v));return (n>>>0).toString(16).toUpperCase()});
+IMPL["Checksum Tool"]=function(box){box.innerHTML=ioUI("Text to checksum...","CALCULATE");IOFN=function(v){var b=strBytes(v);var sum=b.reduce(function(a,c){return a+c},0);return "Sum8: "+(sum%256)+"\nSum32: "+sum+"\nCRC32: 0x"+(crc32(b)>>>0).toString(16).toUpperCase()+"\nSHA-256: "+hex(sha256(b))}};
+var B32="ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+regIO("Base32 Encode",function(v){var b=strBytes(v),o="",i=0,bits=0,val=0;while(i<b.length){val=(val<<8)|b[i++];bits+=8;while(bits>=5){o+=B32[(val>>>(bits-5))&31];bits-=5}if(bits>0&&i>=b.length){o+=B32[(val<<(5-bits))&31];bits=0}}while(o.length%8!==0)o+="=";return o});
+IMPL["Credit Card Validator"]=function(box){box.innerHTML=ioUI("Card number (spaces ok)...","VALIDATE");IOFN=function(v){
+ var d=v.replace(/\D/g,"");if(d.length<13||d.length>19)throw new Error("Bad length");
+ var sum=0,alt=false;
+ for(var i=d.length-1;i>=0;i--){var n=+d[i];if(alt){n*=2;if(n>9)n-=9}sum+=n;alt=!alt}
+ var b=d[0]==="4"?"Visa":d[0]==="5"?"Mastercard":d[0]==="3"?"Amex":d[0]==="6"?"Discover":"Unknown";
+ return (sum%10===0?"✔ VALID":"✘ INVALID")+" · "+b;
+}};
+regIO("IBAN Validator",function(v){
+ var s=v.replace(/\s/g,"").toUpperCase();
+ if(!/^[A-Z]{2}[0-9]{2}[A-Z0-9]{10,30}$/.test(s))return "✘ Invalid IBAN format";
+ var r=s.slice(4)+s.slice(0,4),n="";
+ for(var i=0;i<r.length;i++){var c=r[i];n+=/[0-9]/.test(c)?c:String(c.charCodeAt(0)-55)}
+ var rem=0;for(i=0;i<n.length;i++)rem=(rem*10+ +n[i])%97;
+ return rem===1?"✔ VALID IBAN (mod-97 passed)":"✘ INVALID (checksum failed)";
+});
+IMPL["File Checksum"]=function(box){box.innerHTML='<label class="lb">CHOOSE FILE</label><input type="file" id="fcf" class="fin"/><div class="out" id="fcout" style="display:none"></div>';$("fcf").onchange=function(){var f=$("fcf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){var b=new Uint8Array(fr.result);$("fcout").style.display="block";$("fcout").innerHTML="File: "+esc(f.name)+" ("+(f.size/1024).toFixed(1)+" KB)\nSHA-256: <b>"+hex(sha256(Array.from(b)))+"</b>\nCRC32: 0x"+(crc32(Array.from(b))>>>0).toString(16).toUpperCase()};fr.readAsArrayBuffer(f)}};
+IMPL["Secure Notes"]=function(box){
+ box.innerHTML='<label class="lb">NEW NOTE (STORED ON DEVICE ONLY)</label><textarea class="tin" id="nt" style="height:70px"></textarea><button class="btn" onclick="ntAdd()">💾 SAVE NOTE</button><p class="secl">SAVED NOTES</p><div id="ntlist"></div>';ntRender();
+};
+function ntRender(){var ns=db("notes",[])||[];$("ntlist").innerHTML=ns.length?ns.map(function(n,i){return '<div class="out">'+esc(n)+' <button class="btn2" onclick="ntDel('+i+')" style="float:right;margin-top:0;padding:4px 10px">✕</button></div>'}).join(""):'<p style="font-size:11px;color:#3f8a6b">No notes yet.</p>'}
+function ntAdd(){var v=$("nt").value.trim();if(!v)return;var ns=db("notes",[])||[];ns.unshift(v);db("notes",ns);$("nt").value="";ntRender()}
+function ntDel(i){var ns=db("notes",[])||[];ns.splice(i,1);db("notes",ns);ntRender()}
+IMPL["UUID Generator"]=function(box){box.innerHTML='<button class="btn" onclick="uuidGo()">🆔 GENERATE UUID</button><div class="out" id="uout" style="display:none"></div>'};
+function uuidGo(){var b=crypto.getRandomValues(new Uint8Array(16));b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;var h=hex(Array.from(b));$("uout").style.display="block";$("uout").innerHTML="<b>"+h.slice(0,8)+"-"+h.slice(8,12)+"-"+h.slice(12,16)+"-"+h.slice(16,20)+"-"+h.slice(20)+"</b>"}
+regIO("Random Bytes",function(v){var n=Math.min(256,Math.max(1,Math.round(num(v||"16"))));var a=crypto.getRandomValues(new Uint8Array(n));return hex(Array.from(a))},"How many bytes? (e.g. 16)");
+IMPL["Crypto Key Generator"]=function(box){box.innerHTML='<label class="lb">KEY SIZE</label><select class="fin" id="f_s"><option>128</option><option>256</option><option>512</option></select><button class="btn" onclick="ckGo()">🔑 GENERATE HEX KEY</button><div class="out" id="ckout" style="display:none"></div>'};
+function ckGo(){var n=+$("f_s").value/8,a=crypto.getRandomValues(new Uint8Array(n));$("ckout").style.display="block";$("ckout").innerHTML="<b>"+hex(Array.from(a))+"</b>"}
+regIO("Text Obfuscator",function(v){return v.split("").map(function(c){return c+"\u200B"}).join("")});
+/* ============ IMAGE ============ */
+regImg("Image Compressor",'<label class="lb">JPEG QUALITY: <span id="qv">70</span>%</label><input class="fin" id="f_q" type="range" min="10" max="95" value="70"/>',function(){var q=+$("f_q").value/100,d=scaleMax(IM_IMG),cv=imCanvas(d[0],d[1]);cv.getContext("2d").drawImage(IM_IMG,0,0,d[0],d[1]);return {cvs:[cv],url:cv.toDataURL("image/jpeg",q),note:"Original "+IM_IMG.width+"×"+IM_IMG.height+" → JPEG "+q*100+"%"}},'gitoolbox.jpg');
+IMPL["Image Resizer"]=function(box){
+ regImg("x",'<label class="lb">WIDTH (PX)</label><input class="fin" id="f_w" type="number" value="800"/><label class="lb">HEIGHT (PX)</label><input class="fin" id="f_h" type="number" value="600"/>',
+ function(){var w=+$("f_w").value,h=+$("f_h").value;if(!w||!h)throw new Error("Set width & height");var cv=imCanvas(w,h);cv.getContext("2d").drawImage(IM_IMG,0,0,w,h);return {cvs:[cv],url:cv.toDataURL("image/png"),note:IM_IMG.width+"×"+IM_IMG.height+" → "+w+"×"+h}},"gitoolbox_resized.png")(box);
+};
+IMPL["PNG → JPG"]=function(box){regImg("x",'<label class="lb">JPEG QUALITY: <span id="qv">85</span>%</label><input class="fin" id="f_q" type="range" min="10" max="95" value="85"/>',function(){var q=+$("f_q").value/100,d=scaleMax(IM_IMG),cv=imCanvas(d[0],d[1]);cv.getContext("2d").drawImage(IM_IMG,0,0,d[0],d[1]);return {cvs:[cv],url:cv.toDataURL("image/jpeg",q)}},"gitoolbox.jpg")(box)};
+IMPL["JPG → PNG"]=function(box){regImg("x","",function(){var d=scaleMax(IM_IMG),cv=imCanvas(d[0],d[1]);cv.getContext("2d").drawImage(IM_IMG,0,0,d[0],d[1]);return {cvs:[cv],url:cv.toDataURL("image/png")}},"gitoolbox.png")(box)};
+IMPL["WebP Converter"]=function(box){regImg("x",'<label class="lb">QUALITY: <span id="qv">80</span>%</label><input class="fin" id="f_q" type="range" min="10" max="95" value="80"/>',function(){var q=+$("f_q").value/100,d=scaleMax(IM_IMG),cv=imCanvas(d[0],d[1]);cv.getContext("2d").drawImage(IM_IMG,0,0,d[0],d[1]);return {cvs:[cv],url:cv.toDataURL("image/webp",q)}},"gitoolbox.webp")(box)};
+function imgCtl(controls,apply,fname){return function(box){regImg("x",controls,apply,fname)(box)}}
+IMPL["Image Cropper"]=imgCtl('<label class="lb">X OFFSET (%)</label><input class="fin" id="f_x" type="number" value="10"/><label class="lb">Y OFFSET (%)</label><input class="fin" id="f_y" type="number" value="10"/><label class="lb">WIDTH (%)</label><input class="fin" id="f_w" type="number" value="80"/><label class="lb">HEIGHT (%)</label><input class="fin" id="f_h" type="number" value="80"/>',function(){
+ var I=IM_IMG,x0=I.width*(+$("f_x").value)/100,y0=I.height*(+$("f_y").value)/100,w=I.width*(+$("f_w").value)/100,h=I.height*(+$("f_h").value)/100;
+ var cv=imCanvas(Math.round(w),Math.round(h));cv.getContext("2d").drawImage(I,x0,y0,w,h,0,0,Math.round(w),Math.round(h));
+ return {cvs:[cv],url:cv.toDataURL("image/png")};
+},"gitoolbox_cropped.png");
+IMPL["Rotate Image"]=imgCtl('<label class="lb">ANGLE</label><select class="fin" id="f_a"><option>90</option><option>180</option><option>270</option></select>',function(){
+ var a=+$("f_a").value,I=IM_IMG,sw=a===180?I.width:I.height,sh=a===180?I.height:I.width;
+ var cv=imCanvas(sw,sh),x=cv.getContext("2d");x.translate(sw/2,sh/2);x.rotate(a*Math.PI/180);x.drawImage(I,-I.width/2,-I.height/2);
+ return {cvs:[cv],url:cv.toDataURL("image/png")};
+},"gitoolbox_rotated.png");
+IMPL["Flip Image"]=imgCtl('<label class="lb">DIRECTION</label><select class="fin" id="f_d"><option>Horizontal</option><option>Vertical</option></select>',function(){
+ var I=IM_IMG,cv=imCanvas(I.width,I.height),x=cv.getContext("2d");
+ if($("f_d").value==="Horizontal"){x.translate(I.width,0);x.scale(-1,1)}else{x.translate(0,I.height);x.scale(1,-1)}
+ x.drawImage(I,0,0);return {cvs:[cv],url:cv.toDataURL("image/png")};
+},"gitoolbox_flipped.png");
+function imgFilter(name,fname,filter,extra,defV){IMPL[name]=imgCtl((extra||'<label class="lb">VALUE: <span id="qv">'+(defV||"")+'</span></label><input class="fin" id="f_q" type="range" min="1" max="20" value="'+(defV||4)+'"/>'),function(){var v=$("f_q")?+$("f_q").value:0,I=IM_IMG,d=scaleMax(I),cv=imCanvas(d[0],d[1]),x=cv.getContext("2d");x.filter=filter(v);x.drawImage(I,0,0,d[0],d[1]);return {cvs:[cv],url:cv.toDataURL("image/png")}},fname)}
+imgFilter("Image Blur","gitoolbox_blur.png",function(v){return "blur("+v+"px)"},"<label class='lb'>BLUR: <span id='qv'>4</span>px</label><input class='fin' id='f_q' type='range' min='1' max='20' value='4'/>",4);
+IMPL["Grayscale Filter"]=imgCtl("",function(){var I=IM_IMG,d=scaleMax(I),cv=imCanvas(d[0],d[1]),x=cv.getContext("2d");x.filter="grayscale(1)";x.drawImage(I,0,0,d[0],d[1]);return {cvs:[cv],url:cv.toDataURL("image/png")}},"gitoolbox_gray.png");
+IMPL["Brightness Adjust"]=imgCtl('<label class="lb">BRIGHTNESS: <span id="qv">120</span>%</label><input class="fin" id="f_q" type="range" min="20" max="200" value="120"/>',function(){var b=+$("f_q").value,I=IM_IMG,d=scaleMax(I),cv=imCanvas(d[0],d[1]),x=cv.getContext("2d");x.filter="brightness("+b+"%)";x.drawImage(I,0,0,d[0],d[1]);return {cvs:[cv],url:cv.toDataURL("image/png")}},"gitoolbox_bright.png");
+IMPL["Contrast Adjust"]=imgCtl('<label class="lb">CONTRAST: <span id="qv">130</span>%</label><input class="fin" id="f_q" type="range" min="20" max="200" value="130"/>',function(){var b=+$("f_q").value,I=IM_IMG,d=scaleMax(I),cv=imCanvas(d[0],d[1]),x=cv.getContext("2d");x.filter="contrast("+b+"%)";x.drawImage(I,0,0,d[0],d[1]);return {cvs:[cv],url:cv.toDataURL("image/png")}},"gitoolbox_contrast.png");
+IMPL["Base64 Encode"]=function(box){box.innerHTML='<input type="file" id="imf" accept="image/*" class="fin"/><div class="out" id="b64out" style="display:none"></div>';$("imf").onchange=function(){var f=$("imf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){$("b64out").style.display="block";$("b64out").textContent=fr.result};fr.readAsDataURL(f)}};
+IMPL["Base64 Decode"]=function(box){box.innerHTML=ioUI("Paste data:image/... base64 string...","SHOW IMAGE");box.innerHTML+='<div id="b64img" style="margin-top:12px"></div>';IOFN=function(v){if(!/^data:image\//.test(v.trim()))return "Paste a data:image/ URL below, then tap RUN";return "Image shown below ↓"};window.B64PENDING=true;setTimeout(function(){var b=document.createElement("button");b.className="btn";b.textContent="🖼 SHOW IMAGE";b.onclick=function(){var v=$("ioin").value.trim();$("b64img").innerHTML=/^data:image\//.test(v)?'<img src="'+esc(v)+'" style="max-width:100%;border-radius:8px"/>':'✘ Not a data:image/ URL'};box.appendChild(b)},0)};
+IMPL["Color Picker"]=function(box){
+ box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$('imf').click()">📁 CHOOSE IMAGE → TAP TO PICK COLOR</button><label class="lb">OR PICK MANUALLY</label><input class="fin" id="f_c" type="color" value="#00ff9d"/><div class="bigt" id="cpv">#00FF9D</div><div id="imres"></div>';
+ $("f_c").oninput=function(){$("cpv").textContent=this.value.toUpperCase();$("cpv").style.color=this.value};
+ $("imf").onchange=function(){var f=$("imf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){
+  var d=scaleMax(img),cv=imCanvas(d[0],d[1]),x=cv.getContext("2d");x.drawImage(img,0,0,d[0],d[1]);
+  cv.style.maxWidth="100%";cv.style.borderRadius="8px";cv.style.marginTop="12px";
+  $("imres").innerHTML="";$("imres").appendChild(cv);
+  cv.onclick=function(e){
+   var r=cv.getBoundingClientRect(),px=Math.floor((e.clientX-r.left)*(d[0]/r.width)),py=Math.floor((e.clientY-r.top)*(d[1]/r.height));
+   var p=x.getImageData(px,py,1,1).data;
+   var hx="#"+[p[0],p[1],p[2]].map(function(n){return (n<16?"0":"")+n.toString(16)}).join("").toUpperCase();
+   $("cpv").textContent=hx;$("cpv").style.color=hx;$("f_c").value=hx;
+  };
+ };img.src=fr.result};fr.readAsDataURL(f)};
+};
+IMPL["Palette Generator"]=function(box){
+ box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$('imf').click()">📁 EXTRACT COLORS FROM IMAGE</button><div id="imres"></div>';
+ $("imf").onchange=function(){var f=$("imf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){
+  var cv=imCanvas(64,64),x=cv.getContext("2d");x.drawImage(img,0,0,64,64);
+  var data=x.getImageData(0,0,64,64).data,buckets={};
+  for(var i=0;i<data.length;i+=4){var k=(Math.round(data[i]/32)*32)+","+(Math.round(data[i+1]/32)*32)+","+(Math.round(data[i+2]/32)*32);buckets[k]=(buckets[k]||0)+1}
+  var top=Object.keys(buckets).sort(function(a,b){return buckets[b]-buckets[a]}).slice(0,6);
+  var h="";top.forEach(function(k){var c=k.split(",");var hx="#"+c.map(function(n){return (+n<16?"0":"")+(+n).toString(16)}).join("");h+='<div class="out" style="background:'+hx+';border:1px solid #333"><span style="color:'+(+c[0]+ +c[1]+ +c[2]>380?"#04150e":"#fff")+'">'+hx.toUpperCase()+"</span></div>"});
+  $("imres").innerHTML=h;
+ };img.src=fr.result};fr.readAsDataURL(f)};
+};
+IMPL["Meme Maker"]=imgCtl('<label class="lb">TOP TEXT</label><input class="fin" id="f_t" value="WHEN THE TOOLBOX"/><label class="lb">BOTTOM TEXT</label><input class="fin" id="f_b" value="HAS 300 FEATURES"/>',function(){
+ var I=IM_IMG,d=scaleMax(I),cv=imCanvas(d[0],d[1]),x=cv.getContext("2d");x.drawImage(I,0,0,d[0],d[1]);
+ x.fillStyle="#fff";x.strokeStyle="#000";x.lineWidth=d[1]/28;x.textAlign="center";x.font="900 "+Math.round(d[1]/12)+"px Arial";
+ var t=$("f_t").value.toUpperCase(),b=$("f_b").value.toUpperCase();
+ x.strokeText(t,d[0]/2,d[1]/12+10);x.fillText(t,d[0]/2,d[1]/12+10);
+ x.strokeText(b,d[0]/2,d[1]-14);x.fillText(b,d[0]/2,d[1]-14);
+ return {cvs:[cv],url:cv.toDataURL("image/jpeg",0.92)};
+},"gitoolbox_meme.jpg");
+IMPL["Photo Watermark"]=imgCtl('<label class="lb">WATERMARK TEXT</label><input class="fin" id="f_t" value="© GI KO KO"/><label class="lb">POSITION</label><select class="fin" id="f_p"><option>Bottom Right</option><option>Bottom Left</option><option>Top Right</option><option>Center</option></select>',function(){
+ var I=IM_IMG,d=scaleMax(I),cv=imCanvas(d[0],d[1]),x=cv.getContext("2d");x.drawImage(I,0,0,d[0],d[1]);
+ var fs=Math.round(d[1]/22);x.font="900 "+fs+"px Arial";x.fillStyle="rgba(255,215,0,.9)";x.shadowColor="#000";x.shadowBlur=4;
+ var t=$("f_t").value,p=$("f_p").value,wd=x.measureText(t).width;
+ var px=d[0]/2,py=d[1]/2;
+ if(p==="Bottom Right"){px=d[0]-wd-14;py=d[1]-14}
+ else if(p==="Bottom Left"){px=14;py=d[1]-14}
+ else if(p==="Top Right"){px=d[0]-wd-14;py=fs+10}
+ x.fillText(t,px,py);
+ return {cvs:[cv],url:cv.toDataURL("image/png")};
+},"gitoolbox_watermark.png");
+IMPL["Image Splitter"]=function(box){
+ box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$('imf').click()">📁 CHOOSE IMAGE → SPLIT 2×2</button><div id="imres"></div>';
+ $("imf").onchange=function(){var f=$("imf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){
+  var w=img.width/2,h=img.height/2,res=$("imres");res.innerHTML="";
+  for(var r=0;r<2;r++)for(var c=0;c<2;c++){var cv=imCanvas(Math.round(w),Math.round(h));cv.getContext("2d").drawImage(img,c*w,r*h,w,h,0,0,Math.round(w),Math.round(h));cv.style.maxWidth="48%";cv.style.borderRadius="8px";cv.style.marginTop="10px";res.appendChild(cv)}
+ };img.src=fr.result};fr.readAsDataURL(f)};
+};
+IMPL["Image Merger"]=function(box){
+ box.innerHTML='<label class="lb">IMAGE A</label><input type="file" class="fin" id="im1" accept="image/*"/><label class="lb">IMAGE B</label><input type="file" class="fin" id="im2" accept="image/*"/><button class="btn" onclick="imMerge()">⚡ MERGE SIDE BY SIDE</button><div id="imres"></div>';
+};
+function imMerge(){
+ var f1=$("im1").files[0],f2=$("im2").files[0];if(!f1||!f2)throw new Error("Choose both images");
+ function load(f){return new Promise(function(res){var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){res(img)};img.src=fr.result};fr.readAsDataURL(f)})}
+ Promise.all([load(f1),load(f2)]).then(function(ims){
+  var h=Math.max(ims[0].height,ims[1].height),w1=Math.round(ims[0].width*h/ims[0].height),w2=Math.round(ims[1].width*h/ims[1].height);
+  var cv=imCanvas(w1+w2,h),x=cv.getContext("2d");
+  x.drawImage(ims[0],0,0,w1,h);x.drawImage(ims[1],w1,0,w2,h);
+  cv.style.maxWidth="100%";cv.style.borderRadius="8px";cv.style.marginTop="12px";
+  var res=$("imres");res.innerHTML="";res.appendChild(cv);
+  var a=document.createElement("a");a.className="btn";a.textContent="💾 SAVE MERGED PNG";a.download="gitoolbox_merged.png";a.href=cv.toDataURL("image/png");res.appendChild(a);
+ });
+}
+function imgToJpegBin(img){
+ var d=scaleMax(img),cv=imCanvas(d[0],d[1]);cv.getContext("2d").drawImage(img,0,0,d[0],d[1]);
+ var url=cv.toDataURL("image/jpeg",0.85),b64=url.slice(url.indexOf(",")+1);
+ return {bin:atob(b64),w:d[0],h:d[1]};
+}
+IMPL["Image → PDF"]=function(box){
+ box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$('imf').click()">📁 CHOOSE IMAGE</button><button class="btn" id="imr" style="display:none" onclick="imgPdf()">📄 CREATE PDF</button><div id="imres"></div>';
+ $("imr").style.display="none";
+ $("imf").onchange=function(){var f=$("imf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){IM_IMG=img;$("imr").style.display="block"};img.src=fr.result};fr.readAsDataURL(f)};
+};
+function imgPdf(){
+ try{
+  var im=imgToJpegBin(IM_IMG);
+  var out=makeImagePdf([im]);
+  var res=$("imres");res.innerHTML="";
+  var a=document.createElement("a");a.className="btn";a.textContent="💾 SAVE IMAGE-PDF";a.download="GIToolbox_image.pdf";a.href="data:application/pdf;base64,"+btoa(out);res.appendChild(a);
+ }catch(e){$("imres").innerHTML='<div class="out">Error: '+esc(e.message)+"</div>"}
+}
+IMPL["Images → PDF"]=function(box){
+ box.innerHTML='<label class="lb">CHOOSE IMAGES (MULTI-SELECT)</label><input type="file" id="imf" class="fin" accept="image/*" multiple/><button class="btn" onclick="imgsPdf()">📄 CREATE MULTI-PAGE PDF</button><div id="imres"></div>';
+};
+function imgsPdf(){
+ var fs=$("imf").files;
+ if(!fs||!fs.length){$("imres").innerHTML='<div class="out">Choose at least one image</div>';return}
+ var ps=[];
+ function load(f){return new Promise(function(res){var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){res(imgToJpegBin(img))};img.src=fr.result};fr.readAsDataURL(f)})}
+ var arr=Array.prototype.slice.call(fs,0,10);
+ Promise.all(arr.map(load)).then(function(ims){
+  var out=makeImagePdf(ims);
+  var res=$("imres");res.innerHTML="";
+  var a=document.createElement("a");a.className="btn";a.textContent="💾 SAVE "+ims.length+"-PAGE PDF";a.download="GIToolbox_images.pdf";a.href="data:application/pdf;base64,"+btoa(out);res.appendChild(a);
+ }).catch(function(e){$("imres").innerHTML='<div class="out">Error: '+esc(e.message)+"</div>"});
+}
+/* ============ PDF ============ */
+IMPL["Text → PDF"]=function(box){box.innerHTML=ioUI("Type your document text. Line breaks = new lines, ~90 chars per line.","📄 CREATE PDF");IOFN=function(v){pdfGo(v);return "PDF created — tap SAVE below ↓"}};
+function pdfGo(txt){
+ try{
+  var out=makePdf(txt||"");
+  var res=document.createElement("div");res.style.marginTop="12px";
+  var a=document.createElement("a");a.className="btn";a.textContent="💾 SAVE GIToolbox_text.pdf";a.download="GIToolbox_text.pdf";a.href="data:application/pdf;base64,"+btoa(out);
+  res.appendChild(a);$("tc").appendChild(res);
+ }catch(e){}
+}
+/* ============ AUDIO ============ */
+IMPL["Metronome"]=function(box){
+ box.innerHTML='<label class="lb">TEMPO: <span id="bpmv">120</span> BPM</label><input class="fin" id="f_b" type="range" min="40" max="220" value="120"/><button class="btn" id="mtb" onclick="metGo()">▶ START</button><small class="h">ACCENT EVERY 4TH BEAT</small>';
+ $("f_b").oninput=function(){$("bpmv").textContent=$("f_b").value};
+ window.METON=false;window.METC=0;
+};
+function metGo(){
+ var bpm=+$("f_b").value;
+ window.METON=!window.METON;
+ $("mtb").textContent=window.METON?"⏹ STOP":"▶ START";
+ if(window.METON){
+  window.METC=0;
+  window.METIV=setInterval(function(){window.METC++;beep(window.METC%4===1?1600:1000,0.03,0.3)},60000/bpm);
+  TIMERS.push(window.METIV);
+ }else if(window.METIV)clearInterval(window.METIV);
+}
+/* ============ UTILITY ============ */
+IMPL["Stopwatch"]=function(box){box.innerHTML='<div class="bigt" id="swt">00:00.0</div><div style="display:flex;gap:10px"><button class="btn" id="swb" onclick="swGo()">▶ START</button><button class="btn" onclick="swLap()" style="background:rgba(3,21,14,.9);color:#ffd700;border:1px solid rgba(255,215,0,.4)">LAP</button></div><div id="swl"></div>'};
+function swGo(){
+ if(window.SWON){clearInterval(window.SWIV);window.SWON=false;$("swb").textContent="▶ START";return}
+ window.SWON=true;window.SWT=Date.now()-(window.SWEL||0);$("swb").textContent="⏹ STOP";
+ window.SWIV=setInterval(function(){var t=Date.now()-window.SWT;window.SWEL=t;var m=Math.floor(t/60000),s=Math.floor(t/1000)%60,ds=Math.floor(t/10)%10;$("swt").textContent=(m<10?"0":"")+m+":"+(s<10?"0":"")+s+"."+ds},50);TIMERS.push(window.SWIV);
+}
+function swLap(){var l=document.createElement("p");l.style.cssText="text-align:center;font-size:12px;color:#8affd0;font-family:monospace";l.textContent="LAP "+$("swt").textContent;$("swl").prepend(l)}
+IMPL["Timer"]=function(box){box.innerHTML='<label class="lb">MINUTES</label><input class="fin" id="f_m" type="number" value="5"/><button class="btn" onclick="tmGo()">▶ START TIMER</button><div class="bigt" id="tmt">--:--</div>'};
+function tmGo(){
+ var end=Date.now()+Math.max(1,+$("f_m").value)*60000;
+ clearInterval(window.TMIV);
+ window.TMIV=setInterval(function(){
+  var s=Math.ceil((end-Date.now())/1000);
+  if(s<=0){clearInterval(window.TMIV);$("tmt").textContent="⏰ DONE!";beep(1600,0.15,0.4);setTimeout(function(){beep(1600,0.15,0.4)},300);setTimeout(function(){beep(1600,0.15,0.4)},600);navigator.vibrate&&navigator.vibrate([300,100,300]);return}
+  $("tmt").textContent=(Math.floor(s/60)<10?"0":"")+Math.floor(s/60)+":"+(s%60<10?"0":"")+(s%60);
+ },250);TIMERS.push(window.TMIV);
+}
+IMPL["Pomodoro Timer"]=function(box){box.innerHTML='<div class="bigt" id="pdt">FOCUS 25:00</div><button class="btn" onclick="pdGo()">▶ START POMODORO</button><small class="h">25 MIN FOCUS · 5 MIN BREAK · REPEAT</small>'};
+function pdGo(){
+ var mode="FOCUS",end=Date.now()+25*60000;
+ clearInterval(window.PDIV);
+ window.PDIV=setInterval(function(){
+  var s=Math.ceil((end-Date.now())/1000);
+  if(s<=0){mode=mode==="FOCUS"?"BREAK":"FOCUS";end=Date.now()+(mode==="FOCUS"?25:5)*60000;beep(1800,0.2,0.4);navigator.vibrate&&navigator.vibrate(500);return}
+  $("pdt").textContent=mode+" "+(Math.floor(s/60)<10?"0":"")+Math.floor(s/60)+":"+(s%60<10?"0":"")+(s%60);
+ },250);TIMERS.push(window.PDIV);
+}
+IMPL["World Clock"]=function(box){
+ var zs=["Asia/Yangon","Asia/Bangkok","Asia/Tokyo","Asia/Dubai","Europe/London","Europe/Paris","America/New_York","America/Los_Angeles","Australia/Sydney","UTC"];
+ box.innerHTML='<div id="wc"></div><small class="h">UPDATES EVERY SECOND</small>';
+ function up(){
+  var h="";
+  try{zs.forEach(function(z){h+='<div class="kv"><i>'+z.replace(/_/g," ")+"</i><b>"+new Intl.DateTimeFormat("en-GB",{timeZone:z,dateStyle:"medium",timeStyle:"medium"}).format(new Date())+"</b></div>"})}catch(e){h="Not supported"}
+  $("wc").innerHTML=h;
+ }
+ up();TIMERS.push(setInterval(up,1000));
+};
+IMPL["Countdown"]=IMPL["Countdown Days"]=function(box){box.innerHTML='<label class="lb">TARGET DATE</label><input class="fin" id="f_d" type="date"/><button class="btn" onclick="cdGo()">⏳ COUNTDOWN</button><div class="bigt" id="cdt">--</div>'};
+function cdGo(){
+ var end=new Date($("f_d").value+"T23:59:59").getTime();
+ if(isNaN(end)){return}
+ clearInterval(window.CDIV);
+ window.CDIV=setInterval(function(){
+  var s=Math.floor((end-Date.now())/1000);
+  if(s<0){clearInterval(window.CDIV);$("cdt").textContent="🎉 TODAY!";return}
+  var d=Math.floor(s/86400);s-=d*86400;var h=Math.floor(s/3600),m=Math.floor(s/60)%60;
+  $("cdt").textContent=d+"d "+(h<10?"0":"")+h+":"+(m<10?"0":"")+m;
+ },1000);TIMERS.push(window.CDIV);
+}
+IMPL["Calendar"]=function(box){
+ var n=new Date(),y=n.getFullYear(),m=n.getMonth();
+ var first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+ var names=["SUN","MON","TUE","WED","THU","FRI","SAT"];
+ var h='<div class="hdr"><h1 class="neon">'+n.toLocaleString("en",{month:"long"})+" "+y+'</h1></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px">';
+ names.forEach(function(d2){h+='<p style="text-align:center;font-size:9px;color:#ffd700">'+d2+"</p>"});
+ for(var i=0;i<first;i++)h+="<p></p>";
+ for(i=1;i<=days;i++){
+  var today=i===n.getDate();
+  h+='<div style="text-align:center;padding:8px 0;border-radius:8px;font-size:12px;'+(today?"background:#00ff9d;color:#04150E;font-weight:900;border:1px solid rgba(0,255,157,.3)":"border:1px solid rgba(0,255,157,.15)")+'">'+i+"</div>";
+ }
+ box.innerHTML=h+"</div>";
+};
+IMPL["Quick Notes"]=IMPL["Secure Notes"];
+IMPL["To-Do List"]=function(box){
+ box.innerHTML='<label class="lb">NEW TASK</label><input class="fin" id="tdi" placeholder="Buy bananas..."/><button class="btn" onclick="tdAdd()">➕ ADD TASK</button><p class="secl">TAP TASK = DONE · ✕ = DELETE</p><div id="tdlist"></div>';tdRender();
+};
+function tdRender(){var ts=db("todo",[])||[];$("tdlist").innerHTML=ts.length?ts.map(function(t,i){return '<div class="trow"><span class="nm" style="'+(t.done?"text-decoration:line-through;opacity:.4":"")+'" onclick="tdTog('+i+')">'+esc(t.t)+"</span><button class="btn2" style="margin-top:0;padding:4px 10px" onclick="tdDel("+i+')">✕</button></div>'}).join(""):'<p style="font-size:11px;color:#3f8a6b">Empty — add your first task!</p>'}
+function tdAdd(){var v=$("tdi").value.trim();if(!v)return;var ts=db("todo",[])||[];ts.push({t:v,done:false});db("todo",ts);$("tdi").value="";tdRender()}
+function tdTog(i){var ts=db("todo",[])||[];ts[i].done=!ts[i].done;db("todo",ts);tdRender()}
+function tdDel(i){var ts=db("todo",[])||[];ts.splice(i,1);db("todo",ts);tdRender()}
+IMPL["Habit Tracker"]=function(box){
+ box.innerHTML='<label class="lb">NEW HABIT</label><input class="fin" id="hi" placeholder="Drink water 💧"/><button class="btn" onclick="hAdd()">➕ ADD HABIT</button><p class="secl">TAP HABIT = DONE TODAY</p><div id="hlist"></div>';hRender();
+};
+function hRender(){var hs=db("habits",[])||[];var today=new Date().toDateString();$("hlist").innerHTML=hs.length?hs.map(function(h,i){var done=h.last===today;return '<div class="trow"><span class="nm" style="'+(done?"color:#00ff9d":"")+'" onclick="hTog('+i+')">'+(done?"✅ ":"✖ ")+esc(h.n)+"</span><button class="btn2" style="margin-top:0;padding:4px 10px" onclick="hDel("+i+')">✕</button></div>'}).join(""):'<p style="font-size:11px;color:#3f8a6b">No habits yet.</p>'}
+function hAdd(){var v=$("hi").value.trim();if(!v)return;var hs=db("habits",[])||[];hs.push({n:v,last:""});db("habits",hs);$("hi").value="";hRender()}
+function hTog(i){var hs=db("habits",[])||[];hs[i].last=hs[i].last===new Date().toDateString()?"":new Date().toDateString();db("habits",hs);hRender()}
+function hDel(i){var hs=db("habits",[])||[];hs.splice(i,1);db("habits",hs);hRender()}
+IMPL["Reminder"]=function(box){
+ box.innerHTML='<label class="lb">REMINDER TEXT</label><input class="fin" id="ri" placeholder="Call mom 📞"/><label class="lb">TIME</label><input class="fin" id="rt" type="time"/><button class="btn" onclick="rAdd()">🔔 SET REMINDER</button><p class="secl">ACTIVE (WHILE APP OPEN)</p><div id="rlist"></div>';rRender();
+};
+function rRender(){var rs=db("rem",[])||[];$("rlist").innerHTML=rs.length?rs.map(function(r,i){return '<div class="trow"><span class="nm">'+esc(r.t)+" @ "+r.at+"</span><button class="btn2" style="margin-top:0;padding:4px 10px" onclick="rDel("+i+')">✕</button></div>'}).join(""):'<p style="font-size:11px;color:#3f8a6b">No reminders.</p>'}
+function rAdd(){
+ var t=$("ri").value.trim(),at=$("rt").value;if(!t||!at)return;
+ var rs=db("rem",[])||[];rs.push({t:t,at:at});db("rem",rs);rRender();
+ var iv=setInterval(function(){
+  var now=new Date().toTimeString().slice(0,5);
+  if(now===at){beep(2000,0.2,0.5);setTimeout(function(){beep(2000,0.2,0.5)},400);navigator.vibrate&&navigator.vibrate([400,200,400]);clearInterval(iv)}
+ },15000);TIMERS.push(iv);
+}
+function rDel(i){var rs=db("rem",[])||[];rs.splice(i,1);db("rem",rs);rRender()}
+IMPL["Dice Roller"]=function(box){box.innerHTML='<label class="lb">SIDES</label><select class="fin" id="f_s"><option>6</option><option>4</option><option>8</option><option>12</option><option>20</option></select><label class="lb">NUMBER OF DICE</label><input class="fin" id="f_n" type="number" value="2"/><button class="btn" onclick="diceGo()">🎲 ROLL</button><div class="bigt" id="dout"></div>'};
+function diceGo(){var s=+$("f_s").value,n=Math.min(10,+$("f_n").value||1),o=[];for(var i=0;i<n;i++)o.push(1+Math.floor(Math.random()*s));$("dout").textContent=o.join(" · ")+(n>1?"  (Σ "+o.reduce(function(a,b){return a+b},0)+")":"")}
+IMPL["Coin Flip"]=function(box){box.innerHTML='<button class="btn" onclick="coinGo()">🪙 FLIP COIN</button><div class="bigt" id="cout">Tap to flip</div>'};
+function coinGo(){var n=0;var iv=setInterval(function(){n++;$("cout").textContent=Math.random()<0.5?"HEADS":"TAILS";if(n>10){clearInterval(iv);var r=Math.random()<0.5?"HEADS":"TAILS";$("cout").textContent=r+" ✔";beep(r==="HEADS"?1200:800,0.08)}},80)}
+IMPL["Random Picker"]=IMPL["Name Picker"]=function(box){box.innerHTML=ioUI("One name per line...","PICK RANDOM");IOFN=function(v){var ls=v.split("\n").filter(function(l){return l.trim()});if(!ls.length)throw new Error("Enter names first");return "🎯 PICKED: "+ls[Math.floor(Math.random()*ls.length)]}};
+IMPL["Decision Wheel"]=function(box){
+ box.innerHTML='<label class="lb">OPTIONS (ONE PER LINE)</label><textarea class="tin" id="wo" style="height:80px">Pizza
+Burger
+Salad
+Noodles</textarea><button class="btn" onclick="wheelGo()">🎡 SPIN THE WHEEL</button><canvas id="wcv" width="600" height="600" style="width:100%;max-width:320px;margin:14px auto;display:block"></canvas><div class="bigt" id="wout"></div>'};
+function wheelGo(){
+ var opts=$("wo").value.split("\n").filter(function(l){return l.trim()});
+ if(opts.length<2)opts=["YES","NO"];
+ var cv=$("wcv"),x=cv.getContext("2d"),C=cv.width/2;
+ var cols=["#00ff9d","#ffd700","#4dc9ff","#ff6ec7","#9dff00","#ff9d4d"];
+ var rot=Math.random()*6.28,speed=0.25;
+ function draw(){
+  x.clearRect(0,0,cv.width,cv.height);
+  opts.forEach(function(o,i){
+   var a0=rot+i*2*Math.PI/opts.length,a1=a0+2*Math.PI/opts.length;
+   x.beginPath();x.moveTo(C,C);x.arc(C,C,C-8,a0,a1);x.closePath();
+   x.fillStyle=cols[i%cols.length];x.fill();
+   x.save();x.translate(C,C);x.rotate((a0+a1)/2);
+   x.fillStyle="#04150E";x.font="900 22px Arial";x.textAlign="right";
+   x.fillText(o.slice(0,10),C-20,8);x.restore();
+  });
+  x.beginPath();x.moveTo(C-14,0);x.lineTo(C+14,0);x.lineTo(C,34);x.closePath();x.fillStyle="#ffd700";x.fill();
+ }
+ var step=setInterval(function(){
+  rot+=speed;speed*=0.965;draw();
+  if(speed<0.004){
+   clearInterval(step);
+   var idx=Math.floor(((3*Math.PI/2-rot)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)/(2*Math.PI)*opts.length)%opts.length;
+   $("wout").textContent="🎯 "+opts[idx];
+  }
+ },30);draw();TIMERS.push(step);
+}
+IMPL["Ruler"]=function(box){
+ var px=37.8,cm=10;
+ var h='<div style="border:1px solid rgba(0,255,157,.4);border-radius:8px;margin-top:12px;position:relative;height:60px;background:rgba(3,21,14,.9)">';
+ for(var i=0;i<=cm*10;i++){
+  var big=i%10===0,mid=i%5===0;
+  h+='<div style="position:absolute;left:'+(i*px/10)+'px;top:0;width:1px;height:'+(big?40:mid?28:16)+'px;background:'+(big?"#ffd700":"rgba(0,255,157,.4)")+'"></div>';
+  if(big)h+='<div style="position:absolute;left:'+(i*px/10+2)+'px;top:44px;font-size:9px;color:#8affd0">'+(i/10)+"</div>";
+ }
+ box.innerHTML=h+"</div><small class=h>SCALE ≈ 1 CM = 37.8 PX (96 DPI ASSUMED — APPROXIMATE)</small>";
+};
+IMPL["Protractor"]=function(box){
+ box.innerHTML='<canvas id="pcv" width="600" height="360" style="width:100%;border:1px solid rgba(0,255,157,.3);border-radius:10px"></canvas><small class="h">TAP 3 POINTS: A → VERTEX B → C — SHOWS ANGLE ABC</small><div class="bigt" id="pout">Tap point 1</div>';
+ var cv=$("pcv"),x=cv.getContext("2d"),pts=[];
+ function up(){
+  x.fillStyle="#031209";x.fillRect(0,0,cv.width,cv.height);
+  x.strokeStyle="rgba(0,255,157,.25)";
+  for(var g=0;g<=12;g++){var a=g*30*Math.PI/180;x.beginPath();x.moveTo(300,330);x.lineTo(300+270*Math.cos(a),330-270*Math.sin(a));x.stroke()}
+  pts.forEach(function(p,i){x.beginPath();x.arc(p[0],p[1],8,0,7);x.fillStyle=i===1?"#ffd700":"#00ff9d";x.fill()});
+ }
+ up();
+ cv.onclick=function(e){
+  var r=cv.getBoundingClientRect();
+  var px=(e.clientX-r.left)*(600/r.width),py=(e.clientY-r.top)*(360/r.height);
+  pts.push([px,py]);
+  if(pts.length===3){
+   var A=pts[0],B=pts[1],Cc=pts[2];
+   var v1=[A[0]-B[0],A[1]-B[1]],v2=[Cc[0]-B[0],Cc[1]-B[1]];
+   var dot=v1[0]*v2[0]+v1[1]*v2[1],m=Math.hypot(v1[0],v1[1])*Math.hypot(v2[0],v2[1]);
+   var ang=Math.round(Math.acos(Math.max(-1,Math.min(1,dot/m)))*180/Math.PI);
+   $("pout").textContent="∠ABC = "+ang+"°";
+   x.beginPath();x.moveTo(A[0],A[1]);x.lineTo(B[0],B[1]);x.lineTo(Cc[0],Cc[1]);x.strokeStyle="#ffd700";x.lineWidth=3;x.stroke();
+   pts=[];
+  }
+  up();
+ };
+};
+IMPL["Price Compare"]=function(box){box.innerHTML='<label class="lb">ITEM A: PRICE</label><input class="fin" id="f_p1" type="number" value="1000"/><label class="lb">ITEM A: SIZE (g / ml)</label><input class="fin" id="f_s1" type="number" value="500"/><label class="lb">ITEM B: PRICE</label><input class="fin" id="f_p2" type="number" value="1800"/><label class="lb">ITEM B: SIZE</label><input class="fin" id="f_s2" type="number" value="1000"/><button class="btn" onclick="pcGo()">⚖ COMPARE UNIT PRICE</button><div class="out" id="pcout" style="display:none"></div>'};
+function pcGo(){
+ var u1=num($("f_p1").value)/num($("f_s1").value),u2=num($("f_p2").value)/num($("f_s2").value);
+ $("pcout").style.display="block";
+ $("pcout").innerHTML="Item A: <b>"+r2(u1)+"</b> per unit\nItem B: <b>"+r2(u2)+"</b> per unit\n\n👉 "+(u1<u2?"Item A is cheaper":"Item B is cheaper")+" ("+r2(Math.abs(u1-u2))+" per unit diff)";
+}
+IMPL["Alarm Clock"]=function(box){box.innerHTML='<label class="lb">ALARM TIME</label><input class="fin" id="at" type="time"/><button class="btn" onclick="alGo()">⏰ SET ALARM</button><div class="bigt" id="aout">No alarm set</div><small class="h">WORKS WHILE APP IS OPEN</small>'};
+function alGo(){
+ var t=$("at").value;if(!t)return;
+ $("aout").textContent="⏰ Alarm set for "+t;
+ var iv=setInterval(function(){
+  if(new Date().toTimeString().slice(0,5)===t){
+   clearInterval(iv);
+   $("aout").textContent="🔔 ALARM! "+t;
+   navigator.vibrate&&navigator.vibrate([500,200,500,200,500]);
+   var c=0;var b=setInterval(function(){beep(1800,0.15,0.5);if(++c>8)clearInterval(b)},400);
+  }
+ },1000);TIMERS.push(iv);
+}
+/* ============ AI ============ */
+var STOP=["the","a","an","is","are","was","were","to","of","in","on","and","or","it","this","that","for","with","as","at","by","from","be","have","has"];
+IMPL["Text Summarizer"]=function(box){box.innerHTML='<label class="lb">SENTENCES TO KEEP</label><select class="fin" id="f_n"><option>2</option><option>3</option><option>5</option></select>'+ioUI("Paste a long text...","SUMMARIZE");IOFN=function(v){
+ var sents=v.split(/(?:[.!?]+\s+|\n+)/).filter(function(s){return s.trim()});
+ if(sents.length<2)throw new Error("Need more text");
+ var freq={};v.toLowerCase().split(/\W+/).forEach(function(w){if(w.length>3&&STOP.indexOf(w)<0)freq[w]=(freq[w]||0)+1});
+ var scored=sents.map(function(s,i){var sc=0;s.toLowerCase().split(/\W+/).forEach(function(w){sc+=freq[w]||0});return [sc,i,s]});
+ scored.sort(function(a,b){return b[0]-a[0]});
+ var keep=scored.slice(0,+$("f_n").value).sort(function(a,b){return a[1]-b[1]});
+ return keep.map(function(k){return "• "+k[2].trim()}).join("\n");
+}};
+IMPL["Keyword Extractor"]=function(box){box.innerHTML=ioUI("Paste text...","EXTRACT");IOFN=function(v){
+ var freq={};v.toLowerCase().split(/[^a-z0-9']/).forEach(function(w){if(w.length>3&&STOP.indexOf(w)<0)freq[w]=(freq[w]||0)+1});
+ var top=Object.keys(freq).sort(function(a,b){return freq[b]-freq[a]}).slice(0,10);
+ return top.map(function(w){return w+" × "+freq[w]}).join("\n")||"No keywords found";
+}};
+regIO("Grammar Fixer",function(v){
+ var s=v.trim().replace(/\s+/g," ");
+ s=s.replace(/(^|[.!?]\s+)([a-z])/g,function(a,b,c){return b+c.toUpperCase()});
+ if(s&&!/[.!?]$/.test(s))s+=".";
+ return s;
+});
+var SYN={"good":"great","bad":"poor","big":"large","small":"compact","fast":"rapid","slow":"unhurried","happy":"joyful","sad":"down","make":"create","get":"obtain","use":"utilize","show":"display","help":"assist","need":"require"};
+regIO("Paraphraser",function(v){return v.split(/\b/).map(function(w){var lw=w.toLowerCase();return SYN[lw]?SYN[lw]:w}).join("")});
+var EMOJI={love:"❤️",fire:"🔥",happy:"😊",sad:"😢",star:"⭐",cat:"🐱",dog:"🐶",sun:"☀️",moon:"🌙",rain:"🌧️",food:"🍔",car:"🚗",plane:"✈️",money:"💰",time:"⏰",work:"💼",ok:"👌",yes:"✅",no:"❌",code:"💻",phone:"📱",music:"🎵",book:"📚",heart:"💚"};
+regIO("Text to Emoji",function(v){return v.split(/\b/).map(function(w){var lw=w.toLowerCase().replace(/\s/g,"");return EMOJI[lw]||w}).join("")});
+var FN1=["Cyber","Neon","Gold","Quantum","Turbo","Nova","Astro","Pixel","Hyper","Zen"];
+var FN2=["Wolf","Tiger","Rider","Byte","Storm","Flame","Phoenix","Matrix","Shadow","Falcon"];
+IMPL["Name Generator"]=function(box){box.innerHTML='<button class="btn" onclick="genNames()">🎲 GENERATE 10 NAMES</button><div class="out" id="ngout" style="display:none"></div>'};
+function genNames(){
+ var o=[];for(var i=0;i<10;i++)o.push(FN1[Math.floor(Math.random()*FN1.length)]+" "+FN2[Math.floor(Math.random()*FN2.length)]);
+ $("ngout").style.display="block";$("ngout").textContent=o.join("\n");
+}
+IMPL["Bio Generator"]=function(box){box.innerHTML=ioUI("Your name / keyword...","GENERATE 5 BIOS");
+ IOFN=function(v){v=v||"GI";var t=["✨ "+v+" · Creator of things\n⚡ Coffee → Code → Repeat","🚀 Building the future one line at a time\n💚 "+v+" · Cyber vibes only","🎯 Dreamer · Doer · "+v+"\n📍 Somewhere in the matrix","🔥 "+v+" — powered by passion\n🧠 Always learning","🌈 Simple soul, big dreams\n✌️ "+v+" was here"];return t.join("\n\n—————\n\n")}};
+var QUOTES=["Believe you can and you're halfway there.","The best way out is always through.","Stay hungry, stay foolish.","Small steps every day.","Dream big. Start small. Act now.","Your only limit is you.","Make it happen. Shock the world."];
+IMPL["Quote Maker"]=function(box){box.innerHTML='<button class="btn" onclick="qmGo()">🎲 NEW QUOTE</button><div id="qo" style="margin-top:14px"></div>'};
+function qmGo(){
+ var q=QUOTES[Math.floor(Math.random()*QUOTES.length)];
+ $("qo").innerHTML='<div style="border:1px solid rgba(255,215,0,.4);border-radius:14px;padding:20px;text-align:center;background:linear-gradient(160deg,rgba(255,215,0,.08),rgba(0,255,150,.06))"><p class="gold" style="font-size:16px;font-weight:700;line-height:1.6">"'+q+'"</p><small class="h">— GIToolbox · POWERED BY I KO KO</small></div>';
+}
+IMPL["Slogan Maker"]=function(box){box.innerHTML=ioUI("Your brand / product name...","GENERATE 8 SLOGANS");
+ IOFN=function(v){v=v||"GIToolbox";return [v+" — Built different.",v+": Simply genius.","Think "+v+". Be "+v+".",v+". Zero limits.","One "+v+" to rule them all.","The future is "+v+".",v+" — Power in your pocket.","Get "+v+". Get ahead."].join("\n")}};
+IMPL["Email Writer"]=function(box){box.innerHTML='<label class="lb">TO (NAME / ROLE)</label><input class="fin" id="f_to" value="Sir"/><label class="lb">PURPOSE</label><input class="fin" id="f_p" value="meeting request"/><label class="lb">TONE</label><select class="fin" id="f_t"><option>Formal</option><option>Friendly</option></select><button class="btn" onclick="ewGo()">✉ WRITE EMAIL</button><div class="out" id="ewout" style="display:none"></div>'};
+function ewGo(){
+ var to=$("f_to").value,p=$("f_p").value,t=$("f_t").value;
+ var h=t==="Formal"?"Dear "+to+",\n\nI hope this email finds you well.\n\nI am writing to request "+p+". Please let me know a convenient time.\n\nThank you for your consideration.\n\nBest regards,\nGI Ko Ko":"Hi "+to+"! 👋\n\nHope you're doing great!\n\nI wanted to ask about "+p+". Let me know what works for you!\n\nCheers,\nGI Ko Ko";
+ $("ewout").style.display="block";$("ewout").textContent=h;
+}
+IMPL["Poem Writer"]=function(box){box.innerHTML='<label class="lb">TOPIC</label><input class="fin" id="f_t" value="the moon"/><button class="btn" onclick="poGo()">🪶 WRITE POEM</button><div class="out" id="poout" style="display:none"></div>'};
+function poGo(){
+ var t=$("f_t").value||"the night";
+ var p=["In "+t+"'s glow, the codes align,","A thousand hearts in one design,","The neon green, the gold so bright,","GIToolbox lights the night.","","So dream, and build, and see it through —","The future writes itself in you."].join("\n");
+ $("poout").style.display="block";$("poout").textContent=p;
+}
+IMPL["Blog Outline"]=function(box){box.innerHTML=ioUI("Blog topic...","CREATE OUTLINE");
+ IOFN=function(v){v=v||"Your Topic";return "H1: "+v+" — The Complete Guide\n\nH2: What is "+v+"?\nH2: Why "+v+" matters in 2026\nH2: Getting started (step-by-step)\n  H3: Tools you need\n  H3: Common mistakes\nH2: Advanced tips\nH2: FAQ\nH2: Conclusion + CTA"}};
+IMPL["Product Description"]=function(box){box.innerHTML=ioUI("Product name on line 1, features after...","WRITE DESCRIPTION");
+ IOFN=function(v){var ls=v.split("\n").filter(String);var n=ls[0]||"This product";
+ var feats=ls.slice(1).map(function(f){return "• "+f}).join("\n")||"• Premium quality\n• Built to last\n• Loved by thousands";
+ return "Meet "+n+" — engineered for people who demand more.\n\n"+feats+"\n\n✅ Backed by our 100% satisfaction promise.\n🚀 Order today and experience the difference."}};
+IMPL["Regex Builder"]=function(box){box.innerHTML='<label class="lb">PATTERN TYPE</label><select class="fin" id="f_t"><option>Email</option><option>Phone (+95 format)</option><option>URL</option><option>Date (YYYY-MM-DD)</option><option>Strong password</option></select><label class="lb">TEST STRING</label><input class="fin" id="f_s" value="test@mail.com"/><button class="btn" onclick="reGo()">MATCH TEST</button><div class="out" id="reout" style="display:none"></div>'};
+function reGo(){
+ var rs={Email:"^[^\\s@]+@[^\\s@]+\\.[a-z]{2,}$","Phone (+95 format)":"^\\+?95 ?9\\d{8,9}$",URL:"^https?:\\/\\/.+","Date (YYYY-MM-DD)":"^\\d{4}-\\d{2}-\\d{2}$","Strong password":"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"};
+ var r=new RegExp(rs[$("f_t").value]);
+ var m=$("f_s").value.match(r);
+ $("reout").style.display="block";
+ $("reout").innerHTML="Pattern: <b>"+esc(rs[$("f_t").value])+"</b>\nResult: "+(m?"✔ MATCH":"✘ NO MATCH");
+}
+IMPL["Flashcard Maker"]=function(box){
+ box.innerHTML='<label class="lb">QUESTION</label><input class="fin" id="fq" placeholder="Q..."/><label class="lb">ANSWER</label><input class="fin" id="fa" placeholder="A..."/><button class="btn" onclick="fcAdd()">➕ ADD CARD</button><button class="btn" onclick="fcNext()" style="background:rgba(3,21,14,.9);color:#00ff9d;border:1px solid rgba(0,255,157,.4)">🎴 STUDY MODE (TAP TO FLIP)</button><div id="fclist"></div>';fcRender();
+};
+function fcRender(){var cs=db("cards",[])||[];$("fclist").innerHTML=cs.length?'<p class="secl">'+cs.length+" CARDS SAVED</p>"+cs.map(function(c){return '<div class="trow"><span class="nm">'+esc(c.q)+" → "+esc(c.a)+"</span></div>"}).join(""):'<p style="font-size:11px;color:#3f8a6b;margin-top:8px">No cards yet.</p>'}
+function fcAdd(){var q=$("fq").value.trim(),a=$("fa").value.trim();if(!q||!a)return;var cs=db("cards",[])||[];cs.push({q:q,a:a});db("cards",cs);$("fq").value="";$("fa").value="";fcRender()}
+function fcNext(){
+ var cs=db("cards",[])||[];if(!cs.length)return;
+ var i=0,flip=false;
+ var d=document.createElement("div");d.style.cssText="position:fixed;inset:0;z-index:150;background:rgba(2,10,6,.97);display:flex;align-items:center;justify-content:center;flex-direction:column;padding:30px";
+ function up(){d.innerHTML='<p style="font-size:22px;font-weight:900;text-align:center" class="neon">'+esc(flip?cs[i].a:cs[i].q)+'</p><p style="margin-top:18px;font-size:10px;letter-spacing:.3em;color:#3f8a6b">'+(flip?"ANSWER":"QUESTION")+" — TAP TO FLIP · "+(i+1)+"/"+cs.length+'</p>'}
+ d.onclick=function(){flip=!flip;up()};
+ var ex=document.createElement("button");ex.className="btn2";ex.textContent="✕ EXIT";ex.onclick=function(){d.remove()};d.appendChild(ex);
+ document.body.appendChild(d);up();
+}
+IMPL["Idea Brainstorm"]=function(box){box.innerHTML=ioUI("Topic / area...","BRAINSTORM 8 IDEAS");
+ IOFN=function(v){v=v||"startup";var a=["AI-powered "+v,"Eco-friendly "+v,"Subscription "+v+" service",v+" for beginners","Luxury "+v,"Community-driven "+v,"Mobile-first "+v,"Automated "+v+" toolkit"];return a.join("\n")}};
+/* ============ INIT ============ */
+(function(){
+ for(var i=0;i<24;i++){
+  var p=document.createElement("span");p.className="pt";
+  p.style.left=(i*37%100)+"%";p.style.top=(i*53%100)+"%";
+  p.style.width=p.style.height=(1+(i*3%3)*2)+"px";
+  p.style.background=i%5===0?"#ffd700":"#00ff9d";
+  p.style.animationDuration=(6+(i*7%9))+"s";
+  $("bg").appendChild(p);
+ }
+ var st=document.createElement("style");
+ st.textContent="@keyframes spin{to{transform:rotate(360deg)}}";
+ document.head.appendChild(st);
+ initSplash();
+})();
+</script>
+</body>
+</html>
