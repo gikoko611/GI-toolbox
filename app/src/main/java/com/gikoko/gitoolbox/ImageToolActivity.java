@@ -57,7 +57,7 @@ public class ImageToolActivity extends Activity {
     private String pendingMime = "image/png";
     private String pendingName = "gitoolbox.png";
     private int pendingQuality = 100;
-
+    private byte[] pendingBytes;
     private LinearLayout box;
     private LinearLayout pickedCard;
     private LinearLayout resultCard;
@@ -83,6 +83,7 @@ public class ImageToolActivity extends Activity {
         root.addView(sc, new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         setContentView(root);
+        mainRoot = root;
         pickedCard = Ui.card(this);
         resultCard = Ui.card(this);
         build();
@@ -110,6 +111,11 @@ public class ImageToolActivity extends Activity {
         else if (tool.equals("Meme Maker")) buildMeme();
         else if (tool.equals("Image Splitter")) buildSplitter();
         else if (tool.equals("Image Merger")) buildMerger();
+        else if (tool.equals("Image Blur")) buildBlur();
+        else if (tool.equals("Sharpen Image")) buildSharpen();
+        else if (tool.equals("Screenshot Tool")) buildScreenshot();
+        else if (tool.equals("GIF Maker")) buildGif();
+        else if (tool.equals("ICO Converter")) buildIco();
         else addPanelNote();
     }
 
@@ -173,6 +179,27 @@ public class ImageToolActivity extends Activity {
             return b;
         } catch (Exception e) {
             toast("Could not load image");
+            return null;
+        }
+    }
+
+    /** Silent load for background threads (no toast). */
+    private Bitmap safeLoadSilent(Uri u) {
+        try {
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            InputStream is = getContentResolver().openInputStream(u);
+            BitmapFactory.decodeStream(is, null, o);
+            is.close();
+            int s = 1;
+            while (o.outWidth / s > 2048 || o.outHeight / s > 2048) s *= 2;
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = s;
+            is = getContentResolver().openInputStream(u);
+            Bitmap b = BitmapFactory.decodeStream(is, null, o2);
+            is.close();
+            return b;
+        } catch (Exception e) {
             return null;
         }
     }
@@ -984,6 +1011,312 @@ public class ImageToolActivity extends Activity {
 
     // ---------------------------------------------------------------- result
 
+    // -------- Image Blur / Sharpen (v3)
+
+    private void buildBlur() {
+        box.addView(pickButton("Pick Image"));
+        box.addView(spacer());
+        box.addView(pickedCard);
+        box.addView(spacer());
+        LinearLayout c = Ui.card(this);
+        final EditText rad = Ui.input(this, "Blur radius 1-40 (default 8)", false);
+        rad.setText("8");
+        c.addView(rad);
+        box.addView(c);
+        box.addView(spacer());
+        Button go = Ui.button(this, "Apply Blur");
+        go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (picked == null) { toast("Pick an image first"); return; }
+                int r = clamp(intOf(rad, 8), 1, 40);
+                Bitmap out = boxBlur(picked.copy(Bitmap.Config.ARGB_8888, true), r);
+                showResult(out, Bitmap.CompressFormat.PNG, 100, "image/png", "gitoolbox_blur.png", "Blurred (radius " + r + ")");
+            }
+        });
+        box.addView(go);
+    }
+
+    private Bitmap boxBlur(Bitmap src, int r) {
+        int w = src.getWidth();
+        int h = src.getHeight();
+        int[] px = new int[w * h];
+        src.getPixels(px, 0, w, 0, 0, w, h);
+        // three box passes ≈ gaussian
+        for (int pass = 0; pass < 3; pass++) {
+            px = boxPass(px, w, h, r, true);
+            px = boxPass(px, w, h, r, false);
+        }
+        src.setPixels(px, 0, w, 0, 0, w, h);
+        return src;
+    }
+
+    private int[] boxPass(int[] src, int w, int h, int r, boolean horizontal) {
+        int[] dst = new int[src.length];
+        int len = horizontal ? w : h;
+        int lines = horizontal ? h : w;
+        for (int li = 0; li < lines; li++) {
+            int rs = 0, gs = 0, bs = 0, n = 0;
+            for (int i = 0; i < len; i++) {
+                int add = horizontal ? src[li * w + i] : src[i * w + li];
+                rs += (add >> 16) & 0xFF;
+                gs += (add >> 8) & 0xFF;
+                bs += add & 0xFF;
+                n++;
+                if (i > r) {
+                    int sub = horizontal ? src[li * w + i - r - 1] : src[(i - r - 1) * w + li];
+                    rs -= (sub >> 16) & 0xFF;
+                    gs -= (sub >> 8) & 0xFF;
+                    bs -= sub & 0xFF;
+                    n--;
+                }
+                int pos = horizontal ? li * w + i : i * w + li;
+                dst[pos] = 0xFF000000 | ((rs / n) << 16) | ((gs / n) << 8) | (bs / n);
+            }
+        }
+        return dst;
+    }
+
+    private void buildSharpen() {
+        box.addView(pickButton("Pick Image"));
+        box.addView(spacer());
+        box.addView(pickedCard);
+        box.addView(spacer());
+        LinearLayout c = Ui.card(this);
+        final EditText amt = Ui.input(this, "Sharpen strength 1-5 (default 2)", false);
+        amt.setText("2");
+        c.addView(amt);
+        box.addView(c);
+        box.addView(spacer());
+        Button go = Ui.button(this, "Sharpen Image");
+        go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (picked == null) { toast("Pick an image first"); return; }
+                int s = clamp(intOf(amt, 2), 1, 5);
+                Bitmap out = convolve(picked, new double[][]{
+                        {0, -1, 0},
+                        {-1, 4 + s, -1},
+                        {0, -1, 0}});
+                showResult(out, Bitmap.CompressFormat.PNG, 100, "image/png", "gitoolbox_sharp.png", "Sharpened (strength " + s + ")");
+            }
+        });
+        box.addView(go);
+    }
+
+    private Bitmap convolve(Bitmap src, double[][] k) {
+        int w = src.getWidth();
+        int h = src.getHeight();
+        int[] in = new int[w * h];
+        src.getPixels(in, 0, w, 0, 0, w, h);
+        int[] out = new int[w * h];
+        double sum = 0;
+        for (double[] row : k) for (double v : row) sum += v;
+        if (sum == 0) sum = 1;
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                double rs = 0, gs = 0, bs = 0;
+                for (int ky = -1; ky <= 1; ky++) {
+                    for (int kx = -1; kx <= 1; kx++) {
+                        int sx = Math.min(w - 1, Math.max(0, x + kx));
+                        int sy = Math.min(h - 1, Math.max(0, y + ky));
+                        int p = in[sy * w + sx];
+                        double kv = k[ky + 1][kx + 1];
+                        rs += ((p >> 16) & 0xFF) * kv;
+                        gs += ((p >> 8) & 0xFF) * kv;
+                        bs += (p & 0xFF) * kv;
+                    }
+                }
+                int r = clamp((int) (rs / sum), 0, 255);
+                int g = clamp((int) (gs / sum), 0, 255);
+                int b = clamp((int) (bs / sum), 0, 255);
+                out[y * w + x] = 0xFF000000 | (r << 16) | (g << 8) | b;
+            }
+        }
+        Bitmap res = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        res.setPixels(out, 0, w, 0, 0, w, h);
+        return res;
+    }
+
+    // -------- Screenshot Tool (v3)
+
+    private View mainRoot;
+
+    private void buildScreenshot() {
+        LinearLayout c = Ui.card(this);
+        c.addView(Ui.text(this, "Captures this app's screen (the 3D card layout) and saves it to Pictures/GIToolbox.", 13, Ui.DIM, false));
+        c.addView(Ui.text(this, "Tap the button, then check your gallery.", 12, Ui.DIM, false));
+        box.addView(c);
+        box.addView(spacer());
+        Button go = Ui.button(this, "📸 Capture Screen");
+        go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    View target = mainRoot != null ? mainRoot : findViewById(android.R.id.content);
+                    Bitmap b = Bitmap.createBitmap(target.getWidth(), target.getHeight(), Bitmap.Config.ARGB_8888);
+                    Canvas cv = new Canvas(b);
+                    target.draw(cv);
+                    saveGallery("GIToolbox_screenshot_" + System.currentTimeMillis() + ".png", b);
+                    toast("Screenshot saved to Pictures/GIToolbox ✓");
+                } catch (Exception e) {
+                    toast("Capture failed: " + e.getMessage());
+                }
+            }
+        });
+        box.addView(go);
+    }
+
+    // -------- GIF Maker (v3)
+
+    private List<Uri> gifFrames = new ArrayList<Uri>();
+
+    private void buildGif() {
+        LinearLayout c = Ui.card(this);
+        c.addView(Ui.text(this, "Pick several images — each becomes one GIF frame.", 13, Ui.DIM, false));
+        Button pick = Ui.button(this, "Pick Frames", Ui.GOLD);
+        pick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                it.addCategory(Intent.CATEGORY_OPENABLE);
+                it.setType("image/*");
+                it.putExtra("android.intent.extra.ALLOW_MULTIPLE", true);
+                startActivityForResult(it, 4);
+            }
+        });
+        c.addView(pick);
+        final TextView count = Ui.text(this, gifFrames.size() + " frame(s) selected", 12, Ui.DIM, false);
+        c.addView(count);
+        box.addView(c);
+        box.addView(spacer());
+        LinearLayout opts = Ui.card(this);
+        final EditText delay = Ui.input(this, "Frame delay (1/100s, default 50 = 0.5s)", false);
+        delay.setText("50");
+        final EditText size = Ui.input(this, "Frame width px (default 320)", false);
+        size.setText("320");
+        opts.addView(delay);
+        opts.addView(size);
+        box.addView(opts);
+        box.addView(spacer());
+        Button go = Ui.button(this, "Create GIF");
+        go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                makeGif(count, intOf(delay, 50), intOf(size, 320));
+            }
+        });
+        box.addView(go);
+    }
+
+    private void makeGif(final TextView count, final int delayCs, final int width) {
+        if (gifFrames.size() < 1) { toast("Pick at least one frame"); return; }
+        final int d = clamp(delayCs, 2, 600);
+        final int wpx = clamp(width, 64, 640);
+        toast("Encoding GIF…");
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    List<Bitmap> frames = new ArrayList<Bitmap>();
+                    for (Uri u : gifFrames) {
+                        Bitmap b = safeLoadSilent(u);
+                        if (b == null) continue;
+                        float f = wpx / (float) b.getWidth();
+                        int hh = Math.max(1, (int) (b.getHeight() * f));
+                        frames.add(Bitmap.createScaledBitmap(b, wpx, hh, true));
+                    }
+                    if (frames.size() == 0) throw new Exception("No frames could be loaded");
+                    java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
+                    GifEncoder.encode(frames, d, bos);
+                    final byte[] gif = bos.toByteArray();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            pendingBytes = gif;
+                            pendingResult = null;
+                            pendingText = null;
+                            Intent it = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                            it.addCategory(Intent.CATEGORY_OPENABLE);
+                            it.setType("image/gif");
+                            it.putExtra("android.intent.extra.TITLE", "gitoolbox.gif");
+                            startActivityForResult(it, 2);
+                        }
+                    });
+                } catch (final Exception e) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            toast("GIF failed: " + e.getMessage());
+                        }
+                    });
+                }
+            }
+        }.start();
+        count.setText(gifFrames.size() + " frame(s) selected");
+    }
+
+    // -------- ICO Converter (v3)
+
+    private void buildIco() {
+        box.addView(pickButton("Pick PNG / JPG Image"));
+        box.addView(spacer());
+        box.addView(pickedCard);
+        box.addView(spacer());
+        LinearLayout c = Ui.card(this);
+        c.addView(Ui.text(this, "Converts the image (max 256px) into a Windows .ico icon file. Vista and newer support PNG-inside-ICO.", 12, Ui.DIM, false));
+        box.addView(c);
+        box.addView(spacer());
+        Button go = Ui.button(this, "Convert to ICO");
+        go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (picked == null) { toast("Pick an image first"); return; }
+                try {
+                    Bitmap b = picked;
+                    if (b.getWidth() > 256 || b.getHeight() > 256) {
+                        float f = 256f / Math.max(b.getWidth(), b.getHeight());
+                        b = Bitmap.createScaledBitmap(b,
+                                Math.max(1, (int) (b.getWidth() * f)),
+                                Math.max(1, (int) (b.getHeight() * f)), true);
+                    }
+                    ByteArrayOutputStream png = new ByteArrayOutputStream();
+                    b.compress(Bitmap.CompressFormat.PNG, 100, png);
+                    byte[] pngBytes = png.toByteArray();
+                    ByteArrayOutputStream ico = new ByteArrayOutputStream();
+                    ico.write(new byte[]{0, 0, 0, 1, 1, 0}); // reserved, type icon, count 1
+                    int sz = b.getWidth() == 256 ? 0 : b.getWidth();
+                    ico.write(sz);
+                    ico.write(sz);
+                    ico.write(0); // colors
+                    ico.write(0); // reserved
+                    ico.write(new byte[]{1, 0, 32, 0}); // planes, bpp
+                    writeIntLE(ico, pngBytes.length);
+                    writeIntLE(ico, 22); // data offset
+                    ico.write(pngBytes);
+                    pendingBytes = ico.toByteArray();
+                    pendingResult = null;
+                    pendingText = null;
+                    Intent it = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                    it.addCategory(Intent.CATEGORY_OPENABLE);
+                    it.setType("image/x-icon");
+                    it.putExtra("android.intent.extra.TITLE", "gitoolbox.ico");
+                    startActivityForResult(it, 2);
+                } catch (Exception e) {
+                    toast("ICO failed: " + e.getMessage());
+                }
+            }
+        });
+        box.addView(go);
+    }
+
+    private void writeIntLE(java.io.OutputStream os, int v) throws java.io.IOException {
+        os.write(v & 0xFF);
+        os.write((v >> 8) & 0xFF);
+        os.write((v >> 16) & 0xFF);
+        os.write((v >> 24) & 0xFF);
+    }
+
     @Override
     protected void onActivityResult(int req, int res, Intent data) {
         super.onActivityResult(req, res, data);
@@ -992,6 +1325,17 @@ public class ImageToolActivity extends Activity {
             pickMain(data.getData());
         } else if (req == 2) {
             writeSave(data.getData());
+        } else if (req == 4) {
+            gifFrames.clear();
+            ClipData cd = data.getClipData();
+            if (cd != null) {
+                for (int i = 0; i < cd.getItemCount(); i++) {
+                    gifFrames.add(cd.getItemAt(i).getUri());
+                }
+            } else if (data.getData() != null) {
+                gifFrames.add(data.getData());
+            }
+            toast(gifFrames.size() + " frame(s) selected");
         } else if (req == 10) {
             pickedA = safeLoad(data.getData());
             toast("Image A: " + (pickedA == null ? "failed" : pickedA.getWidth() + " x " + pickedA.getHeight()));
@@ -1004,6 +1348,13 @@ public class ImageToolActivity extends Activity {
     private void writeSave(Uri u) {
         try {
             OutputStream os = getContentResolver().openOutputStream(u);
+            if (pendingBytes != null) {
+                os.write(pendingBytes);
+                os.close();
+                pendingBytes = null;
+                toast("Saved to " + u.getLastPathSegment());
+                return;
+            }
             if (pendingText != null) {
                 os.write(pendingText.getBytes("UTF-8"));
                 os.close();
