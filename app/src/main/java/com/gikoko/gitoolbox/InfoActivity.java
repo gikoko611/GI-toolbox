@@ -3,6 +3,8 @@ package com.gikoko.gitoolbox;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,12 +18,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.InputStream;
+import java.security.MessageDigest;
 import java.util.Locale;
 
 /** Device / CPU / RAM / Storage / Battery info screens. */
 public class InfoActivity extends Activity {
 
     private String tool;
+    private LinearLayout contentRoot;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -58,7 +63,93 @@ public class InfoActivity extends Activity {
             root.addView(color);
         }
         setContentView(Ui.scroll(this, root));
-        out.setText(build());
+        contentRoot = root;
+        Ui.reveal(card);
+        if (tool.equals("File Checksum")) {
+            out.setText("Cryptographic fingerprints, computed fully on-device in streamed chunks.\n\nCompare a file's MD5 / SHA-1 / SHA-256 against a published checksum to verify downloads and detect corrupted or tampered files.\n\nTap the button below and choose any file.");
+            Button pick = Ui.button(this, "📁 PICK A FILE", Ui.GOLD);
+            pick.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                        i.addCategory(Intent.CATEGORY_OPENABLE);
+                        i.setType("*/*");
+                        startActivityForResult(i, 77);
+                    } catch (Exception e) {
+                        Toast.makeText(InfoActivity.this, "No file picker available", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            root.addView(pick);
+        } else {
+            out.setText(build());
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != 77 || resultCode != RESULT_OK || data == null || data.getData() == null) return;
+        final Uri uri = data.getData();
+        final TextView status = Ui.text(this, "⏳ Computing digests…", 13, Ui.GOLD, true);
+        final LinearLayout card2 = Ui.card(this);
+        card2.addView(status);
+        contentRoot.addView(card2);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String result;
+                try {
+                    result = digests(uri);
+                } catch (Exception e) {
+                    result = "Failed: " + e.getMessage();
+                }
+                final String r = result;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        status.setTextColor(Ui.TEXT);
+                        status.setText(r);
+                        Ui.reveal(card2);
+                    }
+                });
+            }
+        }).start();
+    }
+
+    String digests(Uri uri) throws Exception {
+        MessageDigest md5 = MessageDigest.getInstance("MD5");
+        MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+        MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+        InputStream in = getContentResolver().openInputStream(uri);
+        if (in == null) return "Cannot open file.";
+        long total = 0;
+        try {
+            byte[] buf = new byte[65536];
+            int n;
+            while ((n = in.read(buf)) > 0) {
+                md5.update(buf, 0, n);
+                sha1.update(buf, 0, n);
+                sha256.update(buf, 0, n);
+                total += n;
+            }
+        } finally {
+            try {
+                in.close();
+            } catch (Exception ignored) {
+            }
+        }
+        return "FILE SIZE:  " + Compute.fmtBytes(total)
+                + "\n\nMD5:\n" + hex(md5.digest())
+                + "\n\nSHA-1:\n" + hex(sha1.digest())
+                + "\n\nSHA-256:\n" + hex(sha256.digest());
+    }
+
+    static String hex(byte[] b) {
+        StringBuilder sb = new StringBuilder();
+        for (byte x : b) sb.append(String.format("%02x", x & 0xFF));
+        return sb.toString();
     }
 
     void startColorTest() {

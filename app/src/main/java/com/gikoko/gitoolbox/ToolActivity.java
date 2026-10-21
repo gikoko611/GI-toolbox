@@ -33,12 +33,21 @@ public class ToolActivity extends Activity {
             return;
         }
         LinearLayout root = Ui.screen(this);
-        root.addView(Ui.header(this, tool, new Runnable() {
+        LinearLayout header = Ui.header(this, tool, new Runnable() {
             @Override
             public void run() {
                 finish();
             }
-        }));
+        });
+        root.addView(header);
+        LinearLayout hRow = Ui.row(this);
+        LinearLayout.LayoutParams hrLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        hrLp.leftMargin = Ui.dp(this, 10);
+        hRow.setLayoutParams(hrLp);
+        hRow.addView(Ui.badge(this, "● ONLINE", Ui.GREEN));
+        root.addView(hRow);
+        Ui.reveal(hRow);
 
         LinearLayout card = Ui.card(this);
         inputs = new EditText[spec.fields.length];
@@ -70,7 +79,7 @@ public class ToolActivity extends Activity {
         Ui.applyTypeface(output, false, this);
         output.setTextIsSelectable(true);
 
-        LinearLayout outCard = Ui.card(this);
+        final LinearLayout outCard = Ui.card(this);
         outCard.addView(Ui.text(this, "RESULT", 11, Ui.DIM, true));
         outCard.addView(output);
         LinearLayout.LayoutParams olp = new LinearLayout.LayoutParams(
@@ -79,11 +88,7 @@ public class ToolActivity extends Activity {
         outCard.setLayoutParams(olp);
         root.addView(outCard);
 
-        final Button copy = Ui.button(this, "📋 COPY RESULT", Ui.GOLD);
-        LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        clp.topMargin = Ui.dp(this, 10);
-        copy.setLayoutParams(clp);
+        final Button copy = Ui.button(this, "📋 COPY", Ui.GOLD);
         copy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,7 +101,32 @@ public class ToolActivity extends Activity {
                 }
             }
         });
-        root.addView(copy);
+        final Button shareBtn = Ui.button(this, "↗ SHARE", Ui.GREEN);
+        shareBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    android.content.Intent sh = new android.content.Intent(android.content.Intent.ACTION_SEND);
+                    sh.setType("text/plain");
+                    sh.putExtra(android.content.Intent.EXTRA_TEXT,
+                            tool + " — result from GIToolbox:\n\n" + output.getText().toString());
+                    startActivity(android.content.Intent.createChooser(sh, "Share result"));
+                } catch (Exception e) {
+                    Toast.makeText(ToolActivity.this, "No share target", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        LinearLayout btnRow = Ui.row(this);
+        LinearLayout.LayoutParams cblp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        cblp.topMargin = Ui.dp(this, 10);
+        copy.setLayoutParams(cblp);
+        LinearLayout.LayoutParams sblp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        sblp.leftMargin = Ui.dp(this, 8);
+        sblp.topMargin = Ui.dp(this, 10);
+        shareBtn.setLayoutParams(sblp);
+        btnRow.addView(copy);
+        btnRow.addView(shareBtn);
+        root.addView(btnRow);
 
         run.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +141,8 @@ public class ToolActivity extends Activity {
                 } catch (Exception e) {
                     output.setText("Error: " + e.getMessage());
                 }
+                Ui.reveal(outCard);
+                Ui.pop(output);
             }
         });
 

@@ -1,20 +1,31 @@
 package com.gikoko.gitoolbox;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-/** Cyber theme helpers: neon green #00ff9d / gold #ffd700 / dark #04150e */
+/**
+ * Ui v3.0 - "Nebula Green" theme engine: gradient surfaces, 3D elevation shadows,
+ * ripple touches, entrance animations, Padauk typography. 100% programmatic.
+ */
 public final class Ui {
 
     public static final int BG = Color.parseColor("#04150E");
@@ -24,11 +35,13 @@ public final class Ui {
     public static final int GOLD = Color.parseColor("#FFD700");
     public static final int TEXT = Color.parseColor("#EAFFF4");
     public static final int DIM = Color.parseColor("#3F8A6B");
+    public static final int EDGE = Color.parseColor("#1F5540");
+    public static final int RED = Color.parseColor("#FF6B6B");
 
     private Ui() {
     }
 
-    // ---------- Padauk font (bundled Burmese font, OFL) ----------
+    // ---------------------------------------------------------------- fonts
 
     private static Typeface FONT;
     private static Typeface FONT_BOLD;
@@ -52,11 +65,8 @@ public final class Ui {
     /** Apply the bundled Burmese font to a view built outside Ui helpers. */
     public static void applyTypeface(TextView t, boolean bold, Context c) {
         ensureFonts(c);
-        if (bold) {
-            t.setTypeface(FONT_BOLD != null ? FONT_BOLD : Typeface.DEFAULT_BOLD);
-        } else {
-            t.setTypeface(FONT != null ? FONT : Typeface.DEFAULT);
-        }
+        t.setTypeface(bold ? (FONT_BOLD != null ? FONT_BOLD : Typeface.DEFAULT_BOLD)
+                : (FONT != null ? FONT : Typeface.DEFAULT));
     }
 
     private static Typeface fontFor(boolean bold, Context c) {
@@ -65,11 +75,14 @@ public final class Ui {
         return FONT != null ? FONT : Typeface.DEFAULT;
     }
 
+    // ---------------------------------------------------------------- core
+
     public static int dp(Context c, int v) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v,
                 c.getResources().getDisplayMetrics());
     }
 
+    /** Rounded solid surface. */
     public static GradientDrawable round(int color, float radiusDp, Context c) {
         GradientDrawable g = new GradientDrawable();
         g.setColor(color);
@@ -77,6 +90,7 @@ public final class Ui {
         return g;
     }
 
+    /** Rounded surface with hairline stroke. */
     public static GradientDrawable roundStroke(int color, int stroke, float radiusDp, Context c) {
         GradientDrawable g = new GradientDrawable();
         g.setColor(color);
@@ -84,6 +98,33 @@ public final class Ui {
         g.setStroke(Math.max(1, dp(c, 1)), stroke);
         return g;
     }
+
+    /** Vertical gradient surface with hairline stroke - the v3 card look. */
+    public static GradientDrawable surface(Context c) {
+        GradientDrawable g = new GradientDrawable();
+        g.setOrientation(GradientDrawable.Orientation.TL_BR);
+        g.setColors(new int[]{Color.parseColor("#0D2A1D"), Color.parseColor("#081C13")});
+        g.setCornerRadius(dp(c, 16));
+        g.setStroke(Math.max(1, dp(c, 1)), EDGE);
+        return g;
+    }
+
+    /** Glassy gradient button surface with gold/green stroke. */
+    public static GradientDrawable buttonSurface(Context c, int accent) {
+        GradientDrawable g = new GradientDrawable();
+        g.setOrientation(GradientDrawable.Orientation.TL_BR);
+        g.setColors(new int[]{Color.parseColor("#103526"), Color.parseColor("#071F15")});
+        g.setCornerRadius(dp(c, 12));
+        g.setStroke(Math.max(1, dp(c, 1)),
+                accent == GOLD ? Color.parseColor("#8A7420") : Color.parseColor("#1F6C4E"));
+        return g;
+    }
+
+    private static RippleDrawable ripple(int color, android.graphics.drawable.Drawable bg) {
+        return new RippleDrawable(ColorStateList.valueOf(color), bg, bg);
+    }
+
+    // ---------------------------------------------------------------- widgets
 
     public static TextView text(Context c, String s, float sp, int color, boolean bold) {
         TextView t = new TextView(c);
@@ -96,7 +137,7 @@ public final class Ui {
 
     public static TextView gold(Context c, String s, float sp) {
         TextView t = text(c, s, sp, GOLD, true);
-        t.setLetterSpacing(0.18f);
+        t.setLetterSpacing(0.14f);
         return t;
     }
 
@@ -107,8 +148,10 @@ public final class Ui {
         b.setTextColor(color);
         b.setTypeface(fontFor(true, c));
         b.setTextSize(13);
-        b.setBackground(roundStroke(Color.parseColor("#0A2218"), Color.parseColor("#235A44"), 10, c));
-        b.setPadding(dp(c, 14), dp(c, 12), dp(c, 14), dp(c, 12));
+        b.setLetterSpacing(0.06f);
+        b.setBackground(ripple(0x3300FF9D, buttonSurface(c, color)));
+        b.setElevation(dp(c, 4));
+        b.setPadding(dp(c, 16), dp(c, 12), dp(c, 16), dp(c, 12));
         return b;
     }
 
@@ -120,11 +163,12 @@ public final class Ui {
         EditText e = new EditText(c);
         e.setHint(hint);
         e.setHintTextColor(DIM);
-        e.setTypeface(fontFor(false, c));
         e.setTextColor(TEXT);
         e.setTextSize(14);
-        e.setBackground(roundStroke(Color.parseColor("#071B12"), Color.parseColor("#1E4B38"), 10, c));
-        e.setPadding(dp(c, 12), dp(c, 10), dp(c, 12), dp(c, 10));
+        e.setTypeface(fontFor(false, c));
+        e.setBackground(ripple(0x1A00FF9D, roundStroke(Color.parseColor("#071B12"),
+                Color.parseColor("#265F47"), 12, c)));
+        e.setPadding(dp(c, 14), dp(c, 12), dp(c, 14), dp(c, 12));
         e.setSingleLine(!multiline);
         if (multiline) {
             e.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
@@ -137,8 +181,9 @@ public final class Ui {
     public static LinearLayout card(Context c) {
         LinearLayout l = new LinearLayout(c);
         l.setOrientation(LinearLayout.VERTICAL);
-        l.setBackground(round(CARD, 12, c));
-        int p = dp(c, 12);
+        l.setBackground(surface(c));
+        l.setElevation(dp(c, 5));
+        int p = dp(c, 14);
         l.setPadding(p, p, p, p);
         return l;
     }
@@ -152,6 +197,8 @@ public final class Ui {
     public static ScrollView scroll(Context c, View child) {
         ScrollView s = new ScrollView(c);
         s.setFillViewport(true);
+        s.setVerticalFadingEdgeEnabled(true);
+        s.setFadingEdgeLength(dp(c, 24));
         if (child instanceof LinearLayout) ((LinearLayout) child).setOrientation(LinearLayout.VERTICAL);
         s.addView(child);
         return s;
@@ -160,7 +207,10 @@ public final class Ui {
     public static LinearLayout screen(Context c) {
         LinearLayout root = new LinearLayout(c);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(BG);
+        GradientDrawable g = new GradientDrawable();
+        g.setOrientation(GradientDrawable.Orientation.TOP_BOTTOM);
+        g.setColors(new int[]{Color.parseColor("#062018"), Color.parseColor("#04150E"), Color.parseColor("#020C08")});
+        root.setBackground(g);
         int p = dp(c, 14);
         root.setPadding(p, dp(c, 16), p, p);
         return root;
@@ -185,6 +235,63 @@ public final class Ui {
         h.addView(t);
         return h;
     }
+
+    // ---------------------------------------------------------------- v3 extras
+
+    /** Small status pill, e.g. "● LIVE". */
+    public static TextView badge(Context c, String s, int color) {
+        TextView t = text(c, s, 10, color, true);
+        t.setLetterSpacing(0.12f);
+        t.setBackground(roundStroke(Color.parseColor("#06140D"), color, 99, c));
+        t.setPadding(dp(c, 10), dp(c, 4), dp(c, 10), dp(c, 4));
+        return t;
+    }
+
+    /** Entrance reveal: fade + rise. delayMs staggers lists. */
+    public static void reveal(View v, long delayMs) {
+        AnimationSet set = new AnimationSet(true);
+        AlphaAnimation a = new AlphaAnimation(0f, 1f);
+        a.setDuration(360);
+        TranslateAnimation tr = new TranslateAnimation(0, 0, dp(v.getContext(), 26), 0);
+        tr.setDuration(380);
+        set.addAnimation(a);
+        set.addAnimation(tr);
+        set.setStartOffset(delayMs);
+        v.startAnimation(set);
+    }
+
+    public static void reveal(View v) {
+        reveal(v, 0);
+    }
+
+    /** Pop-in with a slight overshoot (splash, logos, results). */
+    public static void pop(View v) {
+        ScaleAnimation s = new ScaleAnimation(0.86f, 1f, 0.86f, 1f,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        s.setDuration(420);
+        v.startAnimation(s);
+    }
+
+    /** Gentle infinite breathing glow (icon pulses). */
+    public static void breathe(View v) {
+        ScaleAnimation s = new ScaleAnimation(1f, 1.08f, 1f, 1.08f,
+                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        s.setDuration(1200);
+        s.setRepeatCount(Animation.INFINITE);
+        s.setRepeatMode(Animation.REVERSE);
+        v.startAnimation(s);
+    }
+
+    /** Horizontal thin divider line. */
+    public static View divider(Context c) {
+        View d = new View(c);
+        d.setBackground(new ColorDrawable(0x1620975A));
+        d.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, Math.max(1, dp(c, 1))));
+        return d;
+    }
+
+    // ---------------------------------------------------------------- format
 
     public static String fmt(double d) {
         if (d == Math.floor(d) && !Double.isInfinite(d) && Math.abs(d) < 1e12) {

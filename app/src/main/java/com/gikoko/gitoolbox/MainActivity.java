@@ -9,6 +9,7 @@ import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -25,7 +26,62 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
-        showSplash();
+        android.content.SharedPreferences prefs = getSharedPreferences("gitoolbox_lists", android.content.Context.MODE_PRIVATE);
+        if (prefs.getString("applock_pin", "").length() > 0) {
+            showGate(prefs);
+        } else {
+            showSplash();
+        }
+    }
+
+    /** PIN gate shown at launch when App Lock is enabled. */
+    private void showGate(final android.content.SharedPreferences prefs) {
+        LinearLayout l = Ui.screen(this);
+        l.setGravity(Gravity.CENTER_VERTICAL);
+
+        LinearLayout c = Ui.card(this);
+        TextView lock = Ui.text(this, "\uD83D\uDD12", 44, Ui.GOLD, false);
+        lock.setGravity(Gravity.CENTER);
+        c.addView(lock);
+        TextView t1 = Ui.gold(this, "APP LOCKED", 18);
+        t1.setGravity(Gravity.CENTER);
+        c.addView(t1);
+        TextView t2 = Ui.text(this, "Enter your PIN to unlock GIToolbox", 12, Ui.DIM, false);
+        t2.setGravity(Gravity.CENTER);
+        c.addView(t2);
+        l.addView(c);
+        Ui.pop(c);
+
+        final EditText pin = Ui.input(this, "PIN", false);
+        pin.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+        pin.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams plp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        plp.topMargin = Ui.dp(this, 12);
+        pin.setLayoutParams(plp);
+        l.addView(pin);
+
+        Button unlock = Ui.button(this, "🔓 UNLOCK", Ui.GREEN);
+        unlock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String p = pin.getText().toString().trim();
+                if (p.equals(prefs.getString("applock_pin", ""))) {
+                    pin.setText("");
+                    showSplash();
+                } else {
+                    pin.setText("");
+                    android.widget.Toast.makeText(MainActivity.this, "Wrong PIN", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        LinearLayout.LayoutParams ulp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        ulp.topMargin = Ui.dp(this, 12);
+        unlock.setLayoutParams(ulp);
+        l.addView(unlock);
+
+        setContentView(l);
     }
 
     private void showSplash() {
@@ -44,10 +100,20 @@ public class MainActivity extends Activity {
         gi.setGravity(Gravity.CENTER);
         gi.setLetterSpacing(0.1f);
         l.addView(gi);
+        Ui.pop(gi);
 
         TextView name = Ui.gold(this, "GIToolbox", 30);
         name.setGravity(Gravity.CENTER);
         l.addView(name);
+        Ui.reveal(name, 200);
+
+        TextView ver = Ui.badge(this, "● v3.0 · NEBULA EDITION", Ui.GREEN);
+        ver.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams vlp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        vlp.topMargin = Ui.dp(this, 10);
+        ver.setLayoutParams(vlp);
+        l.addView(ver);
 
         TextView sub = Ui.text(this, "ALL-IN-ONE · 300 FEATURES · NATIVE ENGINE", 12, Ui.DIM, false);
         sub.setGravity(Gravity.CENTER);
@@ -57,6 +123,7 @@ public class MainActivity extends Activity {
         TextView bar = Ui.text(this, "████████████████████", 16, Ui.GREEN, false);
         bar.setGravity(Gravity.CENTER);
         l.addView(bar);
+        Ui.breathe(bar);
 
         TextView brand = Ui.gold(this, "POWERED BY I KO KO", 14);
         brand.setGravity(Gravity.CENTER);
@@ -87,11 +154,12 @@ public class MainActivity extends Activity {
         hlp.leftMargin = Ui.dp(this, 10);
         ht.setLayoutParams(hlp);
         ht.addView(Ui.gold(this, "GIToolbox", 20));
-        ht.addView(Ui.text(this, "300 FEATURES · NATIVE v2.0", 11, Ui.DIM, false));
+        ht.addView(Ui.text(this, "300 FEATURES · NATIVE v3.0", 11, Ui.DIM, false));
         head.addView(ht);
-        TextView ver = Ui.text(this, "v2.0", 11, Ui.GOLD, true);
+        TextView ver = Ui.text(this, "v3.0", 11, Ui.GOLD, true);
         head.addView(ver);
         root.addView(head);
+        Ui.reveal(head);
 
         // search
         search = Ui.input(this, "Search 300+ tools...", false);
@@ -121,8 +189,15 @@ public class MainActivity extends Activity {
 
         // banner
         LinearLayout banner = Ui.card(this);
-        banner.addView(Ui.gold(this, "⚡ ALL-IN-ONE TOOLBOX · NATIVE", 13));
-        TextView b2 = Ui.text(this, "Cyber Edition · Green • Gold • Dark · POWERED BY I KO KO", 10, Ui.TEXT, false);
+        LinearLayout bTop = Ui.row(this);
+        bTop.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams btlp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+        TextView bTitle = Ui.gold(this, "⚡ ALL-IN-ONE TOOLBOX", 13);
+        bTitle.setLayoutParams(btlp);
+        bTop.addView(bTitle);
+        bTop.addView(Ui.badge(this, "● 300 TOOLS LIVE", Ui.GREEN));
+        banner.addView(bTop);
+        TextView b2 = Ui.text(this, "Nebula Edition · Green • Gold • Dark · POWERED BY I KO KO", 10, Ui.TEXT, false);
         b2.setPadding(0, Ui.dp(this, 4), 0, 0);
         banner.addView(b2);
         LinearLayout.LayoutParams blp = new LinearLayout.LayoutParams(
@@ -130,6 +205,7 @@ public class MainActivity extends Activity {
         blp.topMargin = Ui.dp(this, 12);
         banner.setLayoutParams(blp);
         root.addView(banner);
+        Ui.reveal(banner, 80);
 
         TextView secl = Ui.text(this, "CATEGORIES · 12", 12, Ui.GREEN, true);
         secl.setPadding(0, Ui.dp(this, 16), 0, Ui.dp(this, 6));
@@ -157,6 +233,7 @@ public class MainActivity extends Activity {
             glp.topMargin = Ui.dp(this, 8);
             c.setLayoutParams(glp);
             grid.addView(c);
+            Ui.reveal(c, 120 + i * 60L);
         }
         root.addView(grid);
 

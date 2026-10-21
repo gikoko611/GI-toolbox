@@ -26,16 +26,21 @@ public class PanelActivity extends Activity {
         TextView icon = Ui.text(this, "\u26A1", 40, Ui.GREEN, false);
         icon.setGravity(Gravity.CENTER);
         c.addView(icon);
+        Ui.breathe(icon);
         c.addView(Ui.text(this, tool, 16, Ui.TEXT, true));
-        TextView led = Ui.text(this, "● SLOT READY · NATIVE SUITE", 11, Ui.GREEN, true);
+        TextView led = Ui.badge(this, "● SLOT RESERVED", Ui.GOLD);
         led.setGravity(Gravity.CENTER);
-        led.setPadding(0, Ui.dp(this, 8), 0, 0);
+        LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        llp.topMargin = Ui.dp(this, 8);
+        led.setLayoutParams(llp);
         c.addView(led);
-        TextView msg = Ui.text(this, "This tool slot is registered in the 300-tool native suite. Its engine module ships with the next APK update.", 12, Ui.TEXT, false);
+        TextView msg = Ui.text(this, "This tool slot is registered in the 300-tool native suite.\n\nA few engines need deep platform modules (camera scanning, DRM-signed media, low-level codecs) that cannot run reliably on every device yet — so their slot stays reserved rather than showing a broken screen.\n\nThey ship in the next APK update.", 12, Ui.TEXT, false);
         msg.setGravity(Gravity.CENTER);
         msg.setPadding(0, Ui.dp(this, 10), 0, Ui.dp(this, 6));
         c.addView(msg);
         root.addView(c);
+        Ui.reveal(c);
         Button back = Ui.button(this, "← BACK", Ui.GREEN);
         back.setOnClickListener(new View.OnClickListener() {
             @Override

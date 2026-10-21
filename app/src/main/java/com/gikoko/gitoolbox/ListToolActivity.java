@@ -46,6 +46,8 @@ public class ListToolActivity extends Activity {
 
         if (tool.equals("Secure Notes")) {
             setupSecure(root);
+        } else if (tool.equals("App Lock")) {
+            setupAppLock(root);
         } else {
             setupList(root);
         }
@@ -195,6 +197,93 @@ public class ListToolActivity extends Activity {
         items.set(idx, (done ? "[x] " : "[ ] ") + body);
         save(items);
         render();
+    }
+
+    // ---------- app lock (gate for the whole app) ----------
+    void setupAppLock(LinearLayout root) {
+        boolean hasPin = prefs.getString("applock_pin", "").length() > 0;
+        LinearLayout card = Ui.card(this);
+        TextView status = Ui.text(this, hasPin ? "🔒 App Lock is ACTIVE" : "🔓 App Lock is OFF", 14, hasPin ? Ui.GREEN : Ui.DIM, true);
+        card.addView(status);
+        card.addView(Ui.text(this, hasPin
+                ? "Every time GIToolbox starts, a PIN screen will ask for this PIN before the toolbox opens."
+                : "Set a PIN to require it every time GIToolbox starts. Keep it safe - it is stored only on this device.", 12, Ui.TEXT, false));
+        root.addView(card);
+        Ui.reveal(card);
+
+        if (!hasPin) {
+            final EditText set = Ui.input(this, "New PIN (4-8 digits)", false);
+            set.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+            root.addView(set);
+            Button save = Ui.button(this, "🔑 SAVE PIN", Ui.GOLD);
+            save.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String p = set.getText().toString().trim();
+                    if (p.length() < 4 || p.length() > 8) {
+                        Toast.makeText(ListToolActivity.this, "PIN must be 4-8 digits", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    prefs.edit().putString("applock_pin", p).apply();
+                    Toast.makeText(ListToolActivity.this, "✓ App Lock enabled", Toast.LENGTH_SHORT).show();
+                    recreate();
+                }
+            });
+            root.addView(save);
+        } else {
+            final EditText oldP = Ui.input(this, "Current PIN", false);
+            oldP.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+            final EditText newP = Ui.input(this, "New PIN (leave empty to just verify)", false);
+            newP.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD);
+            root.addView(oldP);
+            root.addView(newP);
+            Button change = Ui.button(this, "↻ CHANGE PIN");
+            change.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String o = oldP.getText().toString().trim();
+                    String n = newP.getText().toString().trim();
+                    if (!o.equals(prefs.getString("applock_pin", ""))) {
+                        Toast.makeText(ListToolActivity.this, "Wrong current PIN", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (n.length() == 0) {
+                        Toast.makeText(ListToolActivity.this, "Nothing to change", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (n.length() < 4 || n.length() > 8) {
+                        Toast.makeText(ListToolActivity.this, "New PIN must be 4-8 digits", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    prefs.edit().putString("applock_pin", n).apply();
+                    Toast.makeText(ListToolActivity.this, "✓ PIN changed", Toast.LENGTH_SHORT).show();
+                    recreate();
+                }
+            });
+            Button off = Ui.button(this, "🗑 TURN OFF APP LOCK", Ui.GOLD);
+            off.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String o = oldP.getText().toString().trim();
+                    if (!o.equals(prefs.getString("applock_pin", ""))) {
+                        Toast.makeText(ListToolActivity.this, "Enter your current PIN first", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    prefs.edit().remove("applock_pin").apply();
+                    Toast.makeText(ListToolActivity.this, "App Lock disabled", Toast.LENGTH_SHORT).show();
+                    recreate();
+                }
+            });
+            LinearLayout row = Ui.row(this);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+            change.setLayoutParams(lp);
+            LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+            lp2.leftMargin = Ui.dp(this, 8);
+            off.setLayoutParams(lp2);
+            row.addView(change);
+            row.addView(off);
+            root.addView(row);
+        }
     }
 
     // ---------- secure notes (PIN protected) ----------
