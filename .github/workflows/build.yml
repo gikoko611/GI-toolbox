@@ -37,10 +37,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           tail -n 200 build.log > report.txt
-          gh issue create --repo "$GITHUB_REPOSITORY" \
-            --title "Build failed $(git rev-parse --short HEAD)" \
-            --body-file report.txt \
-            --label "build-failure" || true
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "Build failed $(git rev-parse --short HEAD)" --body-file report.txt
 
       - name: Rename APK
         run: |
