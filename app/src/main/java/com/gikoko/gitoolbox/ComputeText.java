@@ -385,10 +385,10 @@ final class ComputeText {
                     parseChildren(inner, child);
                     o.accumulate(open, child);
                 } catch (Exception e) {
-                    o.accumulate(open, inner);
+                    try { o.accumulate(open, inner); } catch (Exception ignored) { }
                 }
             } else {
-                o.accumulate(open, inner);
+                try { o.accumulate(open, inner); } catch (Exception ignored) { }
             }
             i = close + open.length() + 3;
         }
