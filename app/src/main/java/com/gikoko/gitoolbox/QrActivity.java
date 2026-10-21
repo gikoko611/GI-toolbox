@@ -105,7 +105,7 @@ public class QrActivity extends Activity {
 
     boolean isPanelTool(String t) {
         return t.equals("QR Scanner") || t.equals("Barcode Scanner") || t.equals("QR with Logo")
-                || t.equals("Code 128") || t.equals("PDF417") || t.equals("Aztec Code")
+                || t.equals("PDF417") || t.equals("Aztec Code")
                 || t.equals("Data Matrix") || t.equals("Codabar");
     }
 
@@ -115,7 +115,7 @@ public class QrActivity extends Activity {
         } else if (tool.equals("QR with Logo")) {
             msg.setText("Custom logo overlay ships in the next APK update.\n\nTip: generate a normal QR here with 'QR Generator' — small logos in the center are readable by most scanners anyway.");
         } else {
-            msg.setText(tool + " generation ships in the next APK update.\n\nAvailable now in this category: QR Generator, WiFi QR, vCard QR, Email/SMS/Phone/Event/Geo QR, Text QR, URL QR, Batch QR, Barcode Generator (Code 39), EAN-13, UPC-A, ITF-14.");
+            msg.setText(tool + " generation ships in the next APK update.\n\nAvailable now in this category: QR Generator, WiFi QR, vCard QR, Email/SMS/Phone/Event/Geo QR, Text QR, URL QR, Batch QR, Barcode Generator (Code 39), Code 128, EAN-13, UPC-A, ITF-14.");
         }
     }
 
@@ -152,7 +152,7 @@ public class QrActivity extends Activity {
             return new String[][]{{"ITEMS", "One item per line", "multi"}};
         }
         if (t.equals("Barcode Generator")) {
-            return new String[][]{{"TYPE", "code39 / ean13 / upca / itf14"}, {"CONTENT", "text or digits"}};
+            return new String[][]{{"TYPE", "code39 / code128 / ean13 / upca / itf14"}, {"CONTENT", "text or digits"}};
         }
         if (t.equals("EAN-13")) {
             return new String[][]{{"DIGITS", "12 or 13 digits (check auto)", "num"}};
@@ -165,6 +165,9 @@ public class QrActivity extends Activity {
         }
         if (t.equals("Code 39")) {
             return new String[][]{{"TEXT", "UPPERCASE letters and digits"}};
+        }
+        if (t.equals("Code 128")) {
+            return new String[][]{{"TEXT", "Any text (ASCII)", "multi"}};
         }
         // QR Generator / Text QR
         return new String[][]{{"TEXT", "Text to encode, max ~106 chars", "multi"}};
@@ -184,7 +187,7 @@ public class QrActivity extends Activity {
                 return;
             }
             if (tool.equals("Barcode Generator") || tool.equals("EAN-13") || tool.equals("UPC-A")
-                    || tool.equals("ITF-14") || tool.equals("Code 39")) {
+                    || tool.equals("ITF-14") || tool.equals("Code 39") || tool.equals("Code 128")) {
                 barView.setBarcode(barcodeSpec(payload));
                 msg.setText("Rendering barcode…");
                 lastMatrix = null;
@@ -276,7 +279,7 @@ public class QrActivity extends Activity {
         }
         try {
             String ext = (tool.equals("Barcode Generator") || tool.equals("EAN-13") || tool.equals("UPC-A")
-                    || tool.equals("ITF-14") || tool.equals("Code 39")) ? "barcode" : "qr";
+                    || tool.equals("ITF-14") || tool.equals("Code 39") || tool.equals("Code 128")) ? "barcode" : "qr";
             String name = "GIToolbox_" + ext + "_" + System.currentTimeMillis() + ".png";
             android.content.ContentValues cv = new android.content.ContentValues();
             cv.put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, name);
@@ -317,10 +320,57 @@ public class QrActivity extends Activity {
         String type = tool.equals("Barcode Generator") ? val(0) : tool;
         String data = tool.equals("Barcode Generator") ? val(1) : val(0);
         if (type.contains("39")) return new BarcodeSpec(code39(data), false);
+        if (type.contains("128")) return new BarcodeSpec(code128(data), true);
         if (type.contains("ean")) return new BarcodeSpec(ean13(data, false), true);
         if (type.contains("upc")) return new BarcodeSpec(ean13(data, true), true);
         if (type.contains("itf")) return new BarcodeSpec(itf14(data), false);
         throw new Exception("Unknown barcode type");
+    }
+
+    // ---------- Code 128 (Code Set B) ----------
+    static final String[] C128 = {
+            "212222", "222122", "222221", "121223", "121322", "131222", "122213", "122312", "132212",
+            "221213", "221312", "231212", "112232", "122132", "122231", "113222", "123122", "123221",
+            "223211", "221132", "221231", "213212", "223112", "312131", "311222", "321122", "321221",
+            "312212", "322112", "322211", "212123", "212321", "232121", "111323", "131123", "131321",
+            "112313", "132113", "132311", "211313", "231113", "231311", "112133", "112331", "132131",
+            "113123", "113321", "133121", "313121", "211331", "231131", "213113", "213311", "213131",
+            "311123", "311321", "331121", "312113", "312311", "332111", "314111", "221411", "431111",
+            "111224", "111422", "121124", "121421", "141122", "141221", "112214", "112412", "122114",
+            "122411", "142112", "142211", "241211", "221114", "413111", "241112", "134111", "111242",
+            "121142", "121241", "114212", "124112", "124211", "411212", "421112", "421211", "212141",
+            "214121", "412121", "111143", "111341", "131141", "114113", "114311", "411113", "411311",
+            "113141", "114131", "311141", "411131"
+    };
+
+    /** Code Set B: ASCII 32-126 map to values 0-94. Start B = 104, stop = 106 + final bar 2. */
+    String code128(String text) throws Exception {
+        StringBuilder t = new StringBuilder();
+        for (char c : text.toCharArray()) {
+            if (c >= 32 && c <= 126) t.append(c);
+            else t.append(' ');
+        }
+        if (t.length() == 0) throw new Exception("Enter some text first");
+        StringBuilder bits = new StringBuilder();
+        appendC128(bits, 104); // Start B
+        int sum = 104;
+        for (int i = 0; i < t.length(); i++) {
+            int v = t.charAt(i) - 32;
+            sum += v * (i + 1);
+            appendC128(bits, v);
+        }
+        appendC128(bits, sum % 103); // checksum
+        // stop: pattern 106 = 233111 (bits 11000111010) + terminating 2-unit bar
+        bits.append("1100011101011");
+        return bits.toString();
+    }
+
+    void appendC128(StringBuilder bits, int value) {
+        String w = C128[value];
+        for (int i = 0; i < 6; i++) {
+            int width = w.charAt(i) - '0';
+            for (int x = 0; x < width; x++) bits.append(i % 2 == 0 ? '1' : '0');
+        }
     }
 
     static final String[] C39 = {
