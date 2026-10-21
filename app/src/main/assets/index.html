@@ -230,9 +230,9 @@ function imPickFile(cb){
 }
 var box=null;
 function regImg(name,controls,apply,fname){IMPL[name]=function(b){
- b.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$('imf').click()">📁 CHOOSE IMAGE</button><div id="imc" style="display:none">'+(controls||"")+'</div><button class="btn" id="imr" style="display:none" onclick="imGo()">⚡ APPLY & SAVE</button><div id="imres"></div>';
+ b.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$(\'imf\').click()">📁 CHOOSE IMAGE</button><div id="imc" style="display:none">'+(controls||"")+'</div><button class="btn" id="imr" style="display:none" onclick="imGo()">⚡ APPLY & SAVE</button><div id="imres"></div>';
  IM_APPLY=apply;IM_FNAME=fname||"gitoolbox.png";imPickFile(b);
-}}
+};return IMPL[name]}
 function imGo(){
  try{
   var r=IM_APPLY();
@@ -481,7 +481,7 @@ var UPWR={W:1,kW:1000,hp:745.7,"BTU/h":293.071,PS:735.499};
 IMPL["Unit Converter"]=function(box){
  var groups={Length:ULEN,Weight:UWGT,Speed:USPD,Area:UAREA,Volume:UVOL,Data:UDATA,Time:UTIME,Angle:UANG,Pressure:UPRES,Energy:UENE,Power:UPWR};
  box.innerHTML='<label class="lb">CATEGORY</label><select class="fin" id="f_g" onchange="ucUpd()">'+Object.keys(groups).map(function(g){return '<option>'+g+"</option>"}).join("")+"</select>"+convUI([]);
- window.UCG=groups;CONVTAB=ULEN;ucUpd();
+ UCG=groups;CONVTAB=ULEN;ucUpd();
 };
 function ucUpd(){var u=Object.keys(UCG[$("f_g").value]),o=u.map(function(x){return '<option>'+x+"</option>"}).join("");$("f_from").innerHTML=o;$("f_to").innerHTML=o;$("f_to").selectedIndex=1;CONVTAB=UCG[$("f_g").value]}
 regConv("Length Converter",ULEN);regConv("Weight Converter",UWGT);regConv("Speed Converter",USPD);regConv("Area Converter",UAREA);regConv("Volume Converter",UVOL);regConv("Data Size",UDATA);regConv("Time Converter",UTIME);regConv("Angle Converter",UANG);regConv("Pressure Converter",UPRES);regConv("Energy Converter",UENE);regConv("Power Converter",UPWR);
@@ -533,7 +533,7 @@ regIO("Binary → Text",function(v){return v.trim().split(/\s+/).map(function(b)
 regIO("Text → Hex",function(v){return strBytes(v).map(function(b){return (b<16?"0":"")+b.toString(16)}).join(" ")});
 /* ============ CALCULATORS ============ */
 function calcUI(keys){return '<div class="disp" id="cd"></div><div class="pad">'+keys.map(function(k){return '<button onclick="cdPress(\''+k+'\')">'+esc(k)+"</button>"}).join("")+"</div>"}
-IMPL["Basic Calculator"]=function(box){box.innerHTML=calcUI(["7","8","9","÷","4","5","6","×","1","2","3","-","0",".","="","+","C","(",")","%"])};
+IMPL["Basic Calculator"]=function(box){box.innerHTML=calcUI(["7","8","9","÷","4","5","6","×","1","2","3","-","0",".","=","+","C","(",")","%"])};
 IMPL["Scientific Calculator"]=function(box){box.innerHTML=calcUI(["sin","cos","tan","÷","ln","log","sqrt","×","^","(",")","-","7","8","9","+","4","5","6",".","1","2","3","=","0","C","pi","%"])};
 function cdPress(k){
  var d=$("cd");
@@ -753,9 +753,7 @@ IMPL["Event QR"]=function(box){box.innerHTML='<label class="lb">TITLE</label><in
 function evQr(){var t=$("f_t").value;if(!t){qrErr("Enter title");return}qrTextGo("BEGIN:VEVENT\nSUMMARY:"+t+"\nLOCATION:"+$("f_l").value+"\nDTSTART:"+$("f_d").value.replace(/[-: ]/g,"")+"\nEND:VEVENT",true)}
 IMPL["Geo QR"]=function(box){box.innerHTML='<label class="lb">LATITUDE</label><input class="fin" id="f_la" value="16.8661"/><label class="lb">LONGITUDE</label><input class="fin" id="f_lo" value="96.1951"/><button class="btn" onclick="geoQr()">⚡ GENERATE GEO QR</button><div id="qrres"></div>'};
 function geoQr(){qrTextGo("geo:"+$("f_la").value+","+$("f_lo").value,true)}
-IMPL["Batch QR"]=function(box){box.innerHTML='<label class="lb">ONE TEXT PER LINE (MAX 8)</label><textarea class="tin" id="qrt" style="height:120px">Item 1
-Item 2
-Item 3</textarea><button class="btn" onclick="batchQr()">⚡ GENERATE ALL</button><div id="qrres"></div>'};
+IMPL["Batch QR"]=function(box){box.innerHTML='<label class="lb">ONE TEXT PER LINE (MAX 8)</label><textarea class="tin" id="qrt" style="height:120px">Item 1\nItem 2\nItem 3</textarea><button class="btn" onclick="batchQr()">⚡ GENERATE ALL</button><div id="qrres"></div>'};
 function batchQr(){
  var lines=$("qrt").value.split("\n").filter(function(l){return l.trim()}).slice(0,8);
  var res=$("qrres");res.innerHTML="";
@@ -781,8 +779,8 @@ IMPL["Device Info"]=function(box){
  box.innerHTML=h;
 };
 IMPL["RAM Monitor"]=function(box){box.innerHTML='<div class="bigt">'+(navigator.deviceMemory?navigator.deviceMemory+" GB":"N/A")+'</div><small class="h">DEVICE MEMORY (APPROXIMATE)</small>'};
-IMPL["Storage Info"]=function(box){box.innerHTML='<div class="bigt" id="sto">...</div><small class="h">APP STORAGE ESTIMATE</small>';if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){$("sto").textContent=(e.usage/1048576).toFixed(1)+" MB used / "+(e.quota/1073741824).toFixed(2)+" GB quota"})else $("sto").textContent="N/A"};
-IMPL["Battery Status"]=function(box){box.innerHTML='<div class="bigt" id="bat">...</div><small class="h">BATTERY</small>';if(navigator.getBattery)navigator.getBattery().then(function(b){function up(){$("bat").textContent=Math.round(b.level*100)+"% "+(b.charging?"⚡":"")}up();b.onlevelchange=up;b.onchargingchange=up})else $("bat").textContent="N/A"};
+IMPL["Storage Info"]=function(box){box.innerHTML='<div class="bigt" id="sto">...</div><small class="h">APP STORAGE ESTIMATE</small>';if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){$("sto").textContent=(e.usage/1048576).toFixed(1)+" MB used / "+(e.quota/1073741824).toFixed(2)+" GB quota"});else $("sto").textContent="N/A"};
+IMPL["Battery Status"]=function(box){box.innerHTML='<div class="bigt" id="bat">...</div><small class="h">BATTERY</small>';if(navigator.getBattery)navigator.getBattery().then(function(b){function up(){$("bat").textContent=Math.round(b.level*100)+"% "+(b.charging?"⚡":"")}up();b.onlevelchange=up;b.onchargingchange=up});else $("bat").textContent="N/A"};
 var SCR_COLORS=["#ff0000","#00ff00","#0000ff","#ffffff","#000000"];
 IMPL["Screen Test"]=IMPL["Dead Pixel Test"]=function(box){box.innerHTML='<p style="font-size:11px;color:#8affd0;margin-bottom:10px">Full-screen color cycles. Tap the screen to advance, long-press to exit.</p><button class="btn" onclick="scrGo()">▶ START TEST</button>'};
 function scrGo(){
@@ -902,7 +900,7 @@ IMPL["Contrast Adjust"]=imgCtl('<label class="lb">CONTRAST: <span id="qv">130</s
 IMPL["Base64 Encode"]=function(box){box.innerHTML='<input type="file" id="imf" accept="image/*" class="fin"/><div class="out" id="b64out" style="display:none"></div>';$("imf").onchange=function(){var f=$("imf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){$("b64out").style.display="block";$("b64out").textContent=fr.result};fr.readAsDataURL(f)}};
 IMPL["Base64 Decode"]=function(box){box.innerHTML=ioUI("Paste data:image/... base64 string...","SHOW IMAGE");box.innerHTML+='<div id="b64img" style="margin-top:12px"></div>';IOFN=function(v){if(!/^data:image\//.test(v.trim()))return "Paste a data:image/ URL below, then tap RUN";return "Image shown below ↓"};window.B64PENDING=true;setTimeout(function(){var b=document.createElement("button");b.className="btn";b.textContent="🖼 SHOW IMAGE";b.onclick=function(){var v=$("ioin").value.trim();$("b64img").innerHTML=/^data:image\//.test(v)?'<img src="'+esc(v)+'" style="max-width:100%;border-radius:8px"/>':'✘ Not a data:image/ URL'};box.appendChild(b)},0)};
 IMPL["Color Picker"]=function(box){
- box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$('imf').click()">📁 CHOOSE IMAGE → TAP TO PICK COLOR</button><label class="lb">OR PICK MANUALLY</label><input class="fin" id="f_c" type="color" value="#00ff9d"/><div class="bigt" id="cpv">#00FF9D</div><div id="imres"></div>';
+ box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$(\'imf\').click()">📁 CHOOSE IMAGE → TAP TO PICK COLOR</button><label class="lb">OR PICK MANUALLY</label><input class="fin" id="f_c" type="color" value="#00ff9d"/><div class="bigt" id="cpv">#00FF9D</div><div id="imres"></div>';
  $("f_c").oninput=function(){$("cpv").textContent=this.value.toUpperCase();$("cpv").style.color=this.value};
  $("imf").onchange=function(){var f=$("imf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){
   var d=scaleMax(img),cv=imCanvas(d[0],d[1]),x=cv.getContext("2d");x.drawImage(img,0,0,d[0],d[1]);
@@ -917,7 +915,7 @@ IMPL["Color Picker"]=function(box){
  };img.src=fr.result};fr.readAsDataURL(f)};
 };
 IMPL["Palette Generator"]=function(box){
- box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$('imf').click()">📁 EXTRACT COLORS FROM IMAGE</button><div id="imres"></div>';
+ box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$(\'imf\').click()">📁 EXTRACT COLORS FROM IMAGE</button><div id="imres"></div>';
  $("imf").onchange=function(){var f=$("imf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){
   var cv=imCanvas(64,64),x=cv.getContext("2d");x.drawImage(img,0,0,64,64);
   var data=x.getImageData(0,0,64,64).data,buckets={};
@@ -947,7 +945,7 @@ IMPL["Photo Watermark"]=imgCtl('<label class="lb">WATERMARK TEXT</label><input c
  return {cvs:[cv],url:cv.toDataURL("image/png")};
 },"gitoolbox_watermark.png");
 IMPL["Image Splitter"]=function(box){
- box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$('imf').click()">📁 CHOOSE IMAGE → SPLIT 2×2</button><div id="imres"></div>';
+ box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$(\'imf\').click()">📁 CHOOSE IMAGE → SPLIT 2×2</button><div id="imres"></div>';
  $("imf").onchange=function(){var f=$("imf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){
   var w=img.width/2,h=img.height/2,res=$("imres");res.innerHTML="";
   for(var r=0;r<2;r++)for(var c=0;c<2;c++){var cv=imCanvas(Math.round(w),Math.round(h));cv.getContext("2d").drawImage(img,c*w,r*h,w,h,0,0,Math.round(w),Math.round(h));cv.style.maxWidth="48%";cv.style.borderRadius="8px";cv.style.marginTop="10px";res.appendChild(cv)}
@@ -974,7 +972,7 @@ function imgToJpegBin(img){
  return {bin:atob(b64),w:d[0],h:d[1]};
 }
 IMPL["Image → PDF"]=function(box){
- box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$('imf').click()">📁 CHOOSE IMAGE</button><button class="btn" id="imr" style="display:none" onclick="imgPdf()">📄 CREATE PDF</button><div id="imres"></div>';
+ box.innerHTML='<input type="file" id="imf" accept="image/*" style="display:none"><button class="btn" onclick="$(\'imf\').click()">📁 CHOOSE IMAGE</button><button class="btn" id="imr" style="display:none" onclick="imgPdf()">📄 CREATE PDF</button><div id="imres"></div>';
  $("imr").style.display="none";
  $("imf").onchange=function(){var f=$("imf").files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){var img=new Image();img.onload=function(){IM_IMG=img;$("imr").style.display="block"};img.src=fr.result};fr.readAsDataURL(f)};
 };
@@ -1094,21 +1092,21 @@ IMPL["Quick Notes"]=IMPL["Secure Notes"];
 IMPL["To-Do List"]=function(box){
  box.innerHTML='<label class="lb">NEW TASK</label><input class="fin" id="tdi" placeholder="Buy bananas..."/><button class="btn" onclick="tdAdd()">➕ ADD TASK</button><p class="secl">TAP TASK = DONE · ✕ = DELETE</p><div id="tdlist"></div>';tdRender();
 };
-function tdRender(){var ts=db("todo",[])||[];$("tdlist").innerHTML=ts.length?ts.map(function(t,i){return '<div class="trow"><span class="nm" style="'+(t.done?"text-decoration:line-through;opacity:.4":"")+'" onclick="tdTog('+i+')">'+esc(t.t)+"</span><button class="btn2" style="margin-top:0;padding:4px 10px" onclick="tdDel("+i+')">✕</button></div>'}).join(""):'<p style="font-size:11px;color:#3f8a6b">Empty — add your first task!</p>'}
+function tdRender(){var ts=db("todo",[])||[];$("tdlist").innerHTML=ts.length?ts.map(function(t,i){return '<div class="trow"><span class="nm" style="'+(t.done?"text-decoration:line-through;opacity:.4":"")+'" onclick="tdTog('+i+')">'+esc(t.t)+'</span><button class="btn2" style="margin-top:0;padding:4px 10px" onclick="tdDel('+i+')">✕</button></div>'}).join(""):'<p style="font-size:11px;color:#3f8a6b">Empty — add your first task!</p>'}
 function tdAdd(){var v=$("tdi").value.trim();if(!v)return;var ts=db("todo",[])||[];ts.push({t:v,done:false});db("todo",ts);$("tdi").value="";tdRender()}
 function tdTog(i){var ts=db("todo",[])||[];ts[i].done=!ts[i].done;db("todo",ts);tdRender()}
 function tdDel(i){var ts=db("todo",[])||[];ts.splice(i,1);db("todo",ts);tdRender()}
 IMPL["Habit Tracker"]=function(box){
  box.innerHTML='<label class="lb">NEW HABIT</label><input class="fin" id="hi" placeholder="Drink water 💧"/><button class="btn" onclick="hAdd()">➕ ADD HABIT</button><p class="secl">TAP HABIT = DONE TODAY</p><div id="hlist"></div>';hRender();
 };
-function hRender(){var hs=db("habits",[])||[];var today=new Date().toDateString();$("hlist").innerHTML=hs.length?hs.map(function(h,i){var done=h.last===today;return '<div class="trow"><span class="nm" style="'+(done?"color:#00ff9d":"")+'" onclick="hTog('+i+')">'+(done?"✅ ":"✖ ")+esc(h.n)+"</span><button class="btn2" style="margin-top:0;padding:4px 10px" onclick="hDel("+i+')">✕</button></div>'}).join(""):'<p style="font-size:11px;color:#3f8a6b">No habits yet.</p>'}
+function hRender(){var hs=db("habits",[])||[];var today=new Date().toDateString();$("hlist").innerHTML=hs.length?hs.map(function(h,i){var done=h.last===today;return '<div class="trow"><span class="nm" style="'+(done?"color:#00ff9d":"")+'" onclick="hTog('+i+')">'+(done?"✅ ":"✖ ")+esc(h.n)+'</span><button class="btn2" style="margin-top:0;padding:4px 10px" onclick="hDel('+i+')">✕</button></div>'}).join(""):'<p style="font-size:11px;color:#3f8a6b">No habits yet.</p>'}
 function hAdd(){var v=$("hi").value.trim();if(!v)return;var hs=db("habits",[])||[];hs.push({n:v,last:""});db("habits",hs);$("hi").value="";hRender()}
 function hTog(i){var hs=db("habits",[])||[];hs[i].last=hs[i].last===new Date().toDateString()?"":new Date().toDateString();db("habits",hs);hRender()}
 function hDel(i){var hs=db("habits",[])||[];hs.splice(i,1);db("habits",hs);hRender()}
 IMPL["Reminder"]=function(box){
  box.innerHTML='<label class="lb">REMINDER TEXT</label><input class="fin" id="ri" placeholder="Call mom 📞"/><label class="lb">TIME</label><input class="fin" id="rt" type="time"/><button class="btn" onclick="rAdd()">🔔 SET REMINDER</button><p class="secl">ACTIVE (WHILE APP OPEN)</p><div id="rlist"></div>';rRender();
 };
-function rRender(){var rs=db("rem",[])||[];$("rlist").innerHTML=rs.length?rs.map(function(r,i){return '<div class="trow"><span class="nm">'+esc(r.t)+" @ "+r.at+"</span><button class="btn2" style="margin-top:0;padding:4px 10px" onclick="rDel("+i+')">✕</button></div>'}).join(""):'<p style="font-size:11px;color:#3f8a6b">No reminders.</p>'}
+function rRender(){var rs=db("rem",[])||[];$("rlist").innerHTML=rs.length?rs.map(function(r,i){return '<div class="trow"><span class="nm">'+esc(r.t)+" @ "+r.at+'</span><button class="btn2" style="margin-top:0;padding:4px 10px" onclick="rDel('+i+')">✕</button></div>'}).join(""):'<p style="font-size:11px;color:#3f8a6b">No reminders.</p>'}
 function rAdd(){
  var t=$("ri").value.trim(),at=$("rt").value;if(!t||!at)return;
  var rs=db("rem",[])||[];rs.push({t:t,at:at});db("rem",rs);rRender();
@@ -1124,10 +1122,7 @@ IMPL["Coin Flip"]=function(box){box.innerHTML='<button class="btn" onclick="coin
 function coinGo(){var n=0;var iv=setInterval(function(){n++;$("cout").textContent=Math.random()<0.5?"HEADS":"TAILS";if(n>10){clearInterval(iv);var r=Math.random()<0.5?"HEADS":"TAILS";$("cout").textContent=r+" ✔";beep(r==="HEADS"?1200:800,0.08)}},80)}
 IMPL["Random Picker"]=IMPL["Name Picker"]=function(box){box.innerHTML=ioUI("One name per line...","PICK RANDOM");IOFN=function(v){var ls=v.split("\n").filter(function(l){return l.trim()});if(!ls.length)throw new Error("Enter names first");return "🎯 PICKED: "+ls[Math.floor(Math.random()*ls.length)]}};
 IMPL["Decision Wheel"]=function(box){
- box.innerHTML='<label class="lb">OPTIONS (ONE PER LINE)</label><textarea class="tin" id="wo" style="height:80px">Pizza
-Burger
-Salad
-Noodles</textarea><button class="btn" onclick="wheelGo()">🎡 SPIN THE WHEEL</button><canvas id="wcv" width="600" height="600" style="width:100%;max-width:320px;margin:14px auto;display:block"></canvas><div class="bigt" id="wout"></div>'};
+ box.innerHTML='<label class="lb">OPTIONS (ONE PER LINE)</label><textarea class="tin" id="wo" style="height:80px">Pizza\nBurger\nSalad\nNoodles</textarea><button class="btn" onclick="wheelGo()">🎡 SPIN THE WHEEL</button><canvas id="wcv" width="600" height="600" style="width:100%;max-width:320px;margin:14px auto;display:block"></canvas><div class="bigt" id="wout"></div>'};
 function wheelGo(){
  var opts=$("wo").value.split("\n").filter(function(l){return l.trim()});
  if(opts.length<2)opts=["YES","NO"];
