@@ -50,19 +50,19 @@ jobs:
 
       - name: Rename APK
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk GIToolbox-v2.1.apk
+          cp app/build/outputs/apk/debug/app-debug.apk GIToolbox-v2.2.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GIToolbox-v2.1-APK
+          name: GIToolbox-v2.2-APK
           path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Release APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.1
-          name: GIToolbox v2.1
-          body: 'GIToolbox v2.1 - FULL NATIVE Android app (no WebView). 300 tools, 12 categories, native UI, sensors, camera, GPS, audio recorder, QR engine, PDF engine, network tools, bundled Padauk Burmese fonts (SIL OFL). Works on Android 8+ / armeabi-v7a (Redmi 9A). POWERED BY I KO KO'
-          files: GIToolbox-v2.1.apk
+          tag_name: v2.2
+          name: GIToolbox v2.2
+          body: 'GIToolbox v2.2 - FULL NATIVE Android app (no WebView). 300 tools, 12 categories, native UI, sensors, camera, GPS, audio recorder, QR engine, PDF engine, network tools, bundled Padauk Burmese fonts (SIL OFL). Works on Android 8+ / armeabi-v7a (Redmi 9A). POWERED BY I KO KO'
+          files: GIToolbox-v2.2.apk
           make_latest: true
