@@ -30,19 +30,19 @@ jobs:
 
       - name: Rename APK
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk GIToolbox-v1.0.apk
+          cp app/build/outputs/apk/debug/app-debug.apk GIToolbox-v1.1.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GIToolbox-v1.0-debug-APK
+          name: GIToolbox-v1.1-APK
           path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Release APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0
-          name: GIToolbox v1.0
-          body: 'GIToolbox v1.0 - 300-tool cyber suite (12 categories x 25 tools). POWERED BY I KO KO'
-          files: GIToolbox-v1.0.apk
+          tag_name: v1.1
+          name: GIToolbox v1.1
+          body: 'GIToolbox v1.1 - 300-tool cyber suite + NATIVE MODULES: flashlight, camera, GPS, sensors, battery, sound meter, vibration. POWERED BY I KO KO'
+          files: GIToolbox-v1.1.apk
           make_latest: true

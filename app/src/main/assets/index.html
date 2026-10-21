@@ -1290,6 +1290,78 @@ function fcNext(){
 }
 IMPL["Idea Brainstorm"]=function(box){box.innerHTML=ioUI("Topic / area...","BRAINSTORM 8 IDEAS");
  IOFN=function(v){v=v||"startup";var a=["AI-powered "+v,"Eco-friendly "+v,"Subscription "+v+" service",v+" for beginners","Luxury "+v,"Community-driven "+v,"Mobile-first "+v,"Automated "+v+" toolkit"];return a.join("\n")}};
+/* ============ NATIVE MODULE BRIDGE (v1.1) ============ */
+var NAT=(typeof GI!=="undefined")&&typeof GI.android==="function"&&GI.android();
+function natPanel(box,txt){box.innerHTML='<div class="pn"><div class="i">📱</div><div class="t">NATIVE ENGINE</div><div class="s"><span class="led"><span class="dot"></span>'+esc(txt)+'</span></div><p>This tool drives your phone hardware directly. It works inside the native GIToolbox APK — install or update to the latest build from GitHub Releases.</p><small class="h">POWERED BY I KO KO</small></div>'}
+function natN(box,name){if(!NAT){natPanel(box,name.toUpperCase()+" NEEDS THE NATIVE APK");return false}return true}
+function natPoll(fn,ms){var iv=setInterval(fn,ms||250);TIMERS.push(iv);fn();return iv}
+IMPL["Flashlight"]=IMPL["Flashlight Torch"]=function(box){
+ if(!natN(box,"Flashlight"))return;
+ box.innerHTML='<div style="text-align:center;padding:14px 0"><div class="bigt" id="flv" style="font-size:26px">OFF</div><button class="btn" id="flb" style="margin-top:16px" onclick="flTog()">🔆 TURN ON</button><small class="h">CAMERA FLASH · NATIVE HARDWARE CONTROL</small></div>'};
+var FLON=false;
+function flTog(){if(!NAT)return;FLON=!FLON;var ok=GI.torch(FLON?1:0);$("flv").textContent=ok?(FLON?"ON 💡":"OFF"):"NO FLASH UNIT";$("flb").textContent=FLON?"❌ TURN OFF":"🔆 TURN ON"}
+IMPL["Mirror Camera"]=function(box){
+ if(!natN(box,"Mirror Camera"))return;
+ box.innerHTML='<button class="btn" onclick="GI.shoot(1)">📷 TAKE MIRROR SELFIE</button><div id="mph" style="margin-top:14px"></div><small class="h">FRONT CAMERA · MIRROR FLIP · NATIVE</small>'};
+function GI_onPhoto(u){var h=$("mph");if(h)h.innerHTML='<img src="'+u+'" style="max-width:100%;border-radius:12px;border:1px solid rgba(0,255,157,.4)"/>'};
+IMPL["Battery Status"]=function(box){
+ if(!NAT){box.innerHTML='<div class="bigt" id="bat">...</div><small class="h">BATTERY</small>';if(navigator.getBattery)navigator.getBattery().then(function(b){function up(){$("bat").textContent=Math.round(b.level*100)+"% "+(b.charging?"⚡":"")}up();b.onlevelchange=up;b.onchargingchange=up});else $("bat").textContent="N/A";return}
+ box.innerHTML='<div class="kv"><i>Level</i><b id="bl">—</b></div><div class="kv"><i>Status</i><b id="bs">—</b></div><div class="kv"><i>Temperature</i><b id="bt">—</b></div><div class="kv"><i>Voltage</i><b id="bv">—</b></div><div class="kv"><i>Plugged</i><b id="bp">—</b></div><div class="kv"><i>Technology</i><b id="bte">—</b></div><small class="h">NATIVE BATTERY MANAGER</small>';
+ natPoll(function(){try{var b=JSON.parse(GI.battery());$("bl").textContent=b.level+"%";$("bs").textContent=b.charging?"⚡ CHARGING":"🔋 ON BATTERY";$("bt").textContent=(b.temp>=0?b.temp+" °C":"—");$("bv").textContent=(b.voltage>0?(b.voltage/1000).toFixed(2)+" V":"—");$("bp").textContent=b.plugged?"YES":"NO";$("bte").textContent=b.tech||"—"}catch(e){}},2000)};
+IMPL["Battery Health"]=function(box){
+ if(!natN(box,"Battery Health"))return;
+ box.innerHTML='<div class="bigt" id="bh">—</div><small class="h">BATTERY HEALTH · NATIVE</small><div class="out" id="bho" style="margin-top:12px"></div>';
+ natPoll(function(){try{var b=JSON.parse(GI.battery());$("bh").textContent=(b.health||"UNKNOWN").toUpperCase();$("bho").innerHTML="Health: <b>"+(b.health||"—")+"</b> · Tech: "+(b.tech||"—")+" · Temp: "+(b.temp>=0?b.temp+" °C":"—")+"</div>"}catch(e){}},1500)};
+IMPL["CPU Monitor"]=function(box){
+ if(!natN(box,"CPU Monitor"))return;
+ box.innerHTML='<div class="kv"><i>CPU cores</i><b id="cc">—</b></div><div class="kv"><i>ABI</i><b id="ca">—</b></div><div class="kv"><i>CPU 0 frequency</i><b id="cf">—</b></div><div class="kv"><i>Chipset</i><b id="ch">—</b></div><small class="h">NATIVE CPU INFO</small>';
+ natPoll(function(){try{var c=JSON.parse(GI.cpu());$("cc").textContent=c.cores;$("ca").textContent=c.abi;$("cf").textContent=c.freq>0?c.freq+" MHz":"—";$("ch").textContent=c.model||"—"}catch(e){}},1000)};
+IMPL["RAM Monitor"]=function(box){
+ if(!NAT){box.innerHTML='<div class="bigt">'+(navigator.deviceMemory?navigator.deviceMemory+" GB":"N/A")+'</div><small class="h">DEVICE MEMORY (APPROXIMATE)</small>';return}
+ box.innerHTML='<div class="kv"><i>Total RAM</i><b id="rt">—</b></div><div class="kv"><i>Available</i><b id="ra">—</b></div><div class="kv"><i>Low memory</i><b id="rl">—</b></div><small class="h">NATIVE MEMORY INFO</small>';
+ natPoll(function(){try{var m=JSON.parse(GI.ram());$("rt").textContent=m.total+" MB";$("ra").textContent=m.avail+" MB";$("rl").textContent=m.low?"YES":"NO"}catch(e){}},1500)};
+IMPL["Device Info"]=function(box){
+ var nav=navigator,h="";
+ if(NAT){try{var d=JSON.parse(GI.device());h+='<div class="kv"><i>Model</i><b>'+esc(d.model)+'</b></div><div class="kv"><i>Brand</i><b>'+esc(d.brand)+"</b></div><div class=\"kv\"><i>Android</i><b>"+esc(d.android)+" (API "+d.sdk+")</b></div><div class=\"kv\"><i>Chipset</i><b>"+esc(d.hardware)+"</b></div><div class=\"kv\"><i>Board</i><b>"+esc(d.board)+"</b></div><div class=\"kv\"><i>Security patch</i><b>"+esc(d.security)+"</b></div>"}catch(e){}}
+ h+='<div class="kv"><i>Screen</i><b>'+screen.width+"×"+screen.height+" px · "+window.devicePixelRatio+"x</b></div><div class=\"kv\"><i>CPU cores</i><b>"+(nav.hardwareConcurrency||"—")+"</b></div><div class=\"kv\"><i>Touch points</i><b>"+(nav.maxTouchPoints||0)+"</b></div><div class=\"kv\"><i>Language</i><b>"+esc(nav.language)+"</b></div>";
+ box.innerHTML=h};
+IMPL["Sensor List"]=function(box){
+ if(!natN(box,"Sensor List"))return;
+ box.innerHTML='<div class="out" id="slist" style="margin-top:0">Reading sensors...</div><small class="h">NATIVE SENSOR MANAGER</small>';
+ setTimeout(function(){try{var a=JSON.parse(GI.sensors()),h="";a.forEach(function(s,i){h+='<div class="kv"><i>#'+(i+1)+"</i><b>"+esc(s.name)+"</b></div>"});$("slist").innerHTML=h||"No sensors found"}catch(e){$("slist").textContent="Error reading sensors"}},200)};
+function sensorUI(box,title,key,fmt){
+ if(!natN(box,title))return;
+ box.innerHTML='<div class="bigt" id="sv">READING...</div><small class="h">'+title.toUpperCase()+' · NATIVE SENSOR</small>';
+ natPoll(function(){try{var s=JSON.parse(GI.sensor(key)),v=s.v||[],el=$("sv");if(el)el.innerHTML=v.length?fmt(v):'<span style="color:#3f8a6b;font-size:14px">Sensor not available on this device</span>'}catch(e){}},250)}
+IMPL["Accelerometer"]=function(box){sensorUI(box,"Accelerometer","accel",function(v){return "X "+v[0].toFixed(1)+" · Y "+v[1].toFixed(1)+" · Z "+v[2].toFixed(1)+" m/s²"})};
+IMPL["Gyroscope"]=function(box){sensorUI(box,"Gyroscope","gyro",function(v){return "X "+v[0].toFixed(2)+" · Y "+v[1].toFixed(2)+" · Z "+v[2].toFixed(2)+" rad/s"})};
+IMPL["Magnetometer"]=function(box){sensorUI(box,"Magnetometer","mag",function(v){return v[0].toFixed(1)+" · "+v[1].toFixed(1)+" · "+v[2].toFixed(1)+" µT"})};
+IMPL["Light Sensor"]=function(box){sensorUI(box,"Light Sensor","light",function(v){return v[0].toFixed(0)+" lux"})};
+IMPL["Proximity Sensor"]=function(box){sensorUI(box,"Proximity Sensor","prox",function(v){return v[0]<1?"NEAR":"FAR · "+v[0].toFixed(1)+" cm"})};
+IMPL["Compass"]=function(box){
+ if(!natN(box,"Compass"))return;
+ box.innerHTML='<div class="bigt" id="sv" style="font-size:30px">—</div><small class="h">MAGNETIC HEADING · NATIVE</small>';
+ natPoll(function(){try{var s=JSON.parse(GI.sensor("mag")),v=s.v;if(v&&v.length>1){var hd=Math.atan2(v[0],v[1])*180/Math.PI;if(hd<0)hd+=360;var dir="N";if(hd>22.5&&hd<=67.5)dir="NE";else if(hd>67.5&&hd<=112.5)dir="E";else if(hd>112.5&&hd<=157.5)dir="SE";else if(hd>157.5&&hd<=202.5)dir="S";else if(hd>202.5&&hd<=247.5)dir="SW";else if(hd>247.5&&hd<=292.5)dir="W";else if(hd>292.5&&hd<=337.5)dir="NW";$("sv").textContent=hd.toFixed(0)+"° "+dir}}catch(e){}},250)};
+IMPL["Altimeter"]=function(box){
+ if(!natN(box,"Altimeter"))return;
+ box.innerHTML='<div class="bigt" id="sv">—</div><small class="h">PRESSURE-BASED ALTITUDE · NATIVE</small><div class="out" id="alp" style="margin-top:12px"></div>';
+ natPoll(function(){try{var s=JSON.parse(GI.sensor("pressure")),v=s.v;if(v&&v.length){var p=v[0];var alt=44330*(1-Math.pow(p/1013.25,0.190294));$("sv").textContent=alt.toFixed(0)+" m";$("alp").textContent="Pressure: "+p.toFixed(1)+" hPa"}}catch(e){}},500)};
+var GPSFN=null;
+function gpsUI(box,title,fn){
+ if(!natN(box,title))return;
+ box.innerHTML='<div class="bigt" id="sv">SEARCHING...</div><small class="h">'+title.toUpperCase()+' · NATIVE LOCATION</small><button class="btn" style="margin-top:12px" onclick="gpsTick()">📍 REFRESH</button>';
+GPSFN=fn;natPoll(gpsTick,2500)}
+function gpsTick(){try{var s=JSON.parse(GI.location()),el=$("sv");if(!el)return;if(s.status==="ask")el.textContent="WAITING FOR PERMISSION...";else if(s.status==="none")el.textContent="NO FIX YET — TURN ON LOCATION, THEN REFRESH";else if(s.status==="ok"&&GPSFN)GPSFN(s)}catch(e){}};
+IMPL["GPS Coordinates"]=function(box){gpsUI(box,"GPS Coordinates",function(s){$("sv").innerHTML=s.lat.toFixed(5)+", "+s.lon.toFixed(5)+"<br/><small>±"+s.acc.toFixed(0)+"m accuracy</small>"})};
+IMPL["GPS Speed"]=function(box){gpsUI(box,"GPS Speed",function(s){$("sv").textContent=(s.spd*3.6).toFixed(1)+" km/h"})};
+IMPL["Sound Meter"]=function(box){
+ if(!natN(box,"Sound Meter"))return;
+ box.innerHTML='<div class="bigt" id="sv">— dB</div><div style="height:6px;border-radius:99px;background:#0c2b1e;overflow:hidden;margin:12px 0"><div id="smb" style="height:100%;width:0%;background:linear-gradient(90deg,#00ff9d,#ffd700)"></div></div><button class="btn" id="smbtn" onclick="smTog()">🎤 START</button><small class="h">MICROPHONE · NATIVE AUDIO</small>'};
+var SMON=false;
+function smTog(){if(!NAT)return;SMON=!SMON;if(SMON){var r=GI.micStart();if(r==="ask"){$("sv").textContent="GRANT MIC PERMISSION, THEN TAP START AGAIN";SMON=false;return}if(r!=="ok"){$("sv").textContent="MIC ERROR";SMON=false;return}$("smbtn").textContent="⏹ STOP";natPoll(function(){var a=GI.micLevel();var db=Math.max(0,Math.round(20*Math.log10(a+1)));var el=$("sv");if(el)el.textContent=db+" dB";var b=$("smb");if(b)b.style.width=Math.min(100,db*1.6)+"%"},150)}else{GI.micStop();$("smbtn").textContent="🎤 START";$("sv").textContent="— dB";$("smb").style.width="0%"}}
+IMPL["Vibration Test"]=function(box){
+ box.innerHTML='<button class="btn" onclick="vibGo(200)">📳 SHORT (200ms)</button><button class="btn" style="background:rgba(3,21,14,.9);color:#00ff9d;border:1px solid rgba(0,255,157,.4)" onclick="vibGo(100,50,100,50,300)">📳 PATTERN</button><button class="btn" style="background:rgba(3,21,14,.9);color:#ffd700;border:1px solid rgba(255,215,0,.4)" onclick="vibGo(2000)">📳 LONG (2s)</button><small class="h">'+(NAT?"NATIVE VIBRATOR":"WEB VIBRATION API")+"</small>"};
+function vibGo(){if(NAT){GI.vibrate(Array.prototype.slice.call(arguments).join(","));return}if(navigator.vibrate){var a=Array.prototype.slice.call(arguments);navigator.vibrate(a.length===1?a[0]:a)}}
 /* ============ INIT ============ */
 (function(){
  for(var i=0;i<24;i++){
