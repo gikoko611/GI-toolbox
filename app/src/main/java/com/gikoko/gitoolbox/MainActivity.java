@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
         ver.setLayoutParams(vlp);
         l.addView(ver);
 
-        TextView sub = Ui.text(this, "ALL-IN-ONE · 300 FEATURES · NATIVE ENGINE", 12, Ui.DIM, false);
+        TextView sub = Ui.text(this, "ALL-IN-ONE · 325 FEATURES · NATIVE ENGINE", 12, Ui.DIM, false);
         sub.setGravity(Gravity.CENTER);
         sub.setLetterSpacing(0.2f);
         l.addView(sub);
@@ -154,7 +154,7 @@ public class MainActivity extends Activity {
         hlp.leftMargin = Ui.dp(this, 10);
         ht.setLayoutParams(hlp);
         ht.addView(Ui.gold(this, "GIToolbox", 20));
-        ht.addView(Ui.text(this, "300 FEATURES · NATIVE v3.0", 11, Ui.DIM, false));
+        ht.addView(Ui.text(this, "325 FEATURES · NATIVE v3.0", 11, Ui.DIM, false));
         head.addView(ht);
         TextView ver = Ui.text(this, "v3.0", 11, Ui.GOLD, true);
         head.addView(ver);
@@ -162,7 +162,7 @@ public class MainActivity extends Activity {
         Ui.reveal(head);
 
         // search
-        search = Ui.input(this, "Search 300+ tools...", false);
+        search = Ui.input(this, "Search 325 tools...", false);
         search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int a, int c, int d) {
@@ -195,7 +195,7 @@ public class MainActivity extends Activity {
         TextView bTitle = Ui.gold(this, "⚡ ALL-IN-ONE TOOLBOX", 13);
         bTitle.setLayoutParams(btlp);
         bTop.addView(bTitle);
-        bTop.addView(Ui.badge(this, "● 300 TOOLS LIVE", Ui.GREEN));
+        bTop.addView(Ui.badge(this, "● 325 TOOLS LIVE", Ui.GREEN));
         banner.addView(bTop);
         TextView b2 = Ui.text(this, "Nebula Edition · Green • Gold • Dark · POWERED BY I KO KO", 10, Ui.TEXT, false);
         b2.setPadding(0, Ui.dp(this, 4), 0, 0);
@@ -207,7 +207,7 @@ public class MainActivity extends Activity {
         root.addView(banner);
         Ui.reveal(banner, 80);
 
-        TextView secl = Ui.text(this, "CATEGORIES · 12", 12, Ui.GREEN, true);
+        TextView secl = Ui.text(this, "CATEGORIES · " + Catalog.CATS.length + "", 12, Ui.GREEN, true);
         secl.setPadding(0, Ui.dp(this, 16), 0, Ui.dp(this, 6));
         root.addView(secl);
 

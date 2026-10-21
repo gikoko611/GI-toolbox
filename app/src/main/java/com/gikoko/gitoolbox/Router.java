@@ -97,6 +97,17 @@ public final class Router {
                 || t.equals("Video Compressor") || t.equals("Video Crop") || t.equals("Video Speed")
                 || t.equals("Video Reverse"))
             return VideoToolActivity.class;
+        // System Pro (3C-style)
+        if (t.equals("App Manager") || t.equals("APK Extractor") || t.equals("App Uninstaller")
+                || t.equals("App Sizes") || t.equals("Exported Checker") || t.equals("Task Manager")
+                || t.equals("RAM Boost") || t.equals("Cache Cleaner") || t.equals("Permission Manager")
+                || t.equals("Startup Manager") || t.equals("Data Usage") || t.equals("Network Monitor")
+                || t.equals("Clipboard Manager") || t.equals("Keep Screen On") || t.equals("Volume Manager")
+                || t.equals("Sound Profile") || t.equals("Ringtone Picker") || t.equals("Refresh Rate")
+                || t.equals("WebView Version") || t.equals("Keyboard List") || t.equals("TTS Engines")
+                || t.equals("Accessibility Checker") || t.equals("Uptime") || t.equals("Kernel Info")
+                || t.equals("Storage Volumes"))
+            return SysActivity.class;
         return null;
     }
 

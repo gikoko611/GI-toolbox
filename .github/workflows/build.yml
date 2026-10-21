@@ -63,6 +63,6 @@ jobs:
         with:
           tag_name: v3.0
           name: GIToolbox v3.0
-          body: 'GIToolbox v3.0 - FULL NATIVE Android app (no WebView). 300 tools, 12 categories, ALL-NEW 3D Nebula Green UI with entrance animations, ripple touch, elevation shadows. Sensors, GPS, camera, audio + video engines (GIF maker, video tools), QR + barcode engine, PDF engine, network suite (30+ tools), App Lock, File Checksum, bundled Padauk Burmese fonts (SIL OFL). Works on Android 8+ / armeabi-v7a (Redmi 9A). POWERED BY I KO KO'
+          body: 'GIToolbox v3.0 - FULL NATIVE Android app (no WebView). 325 tools, 13 categories, all-new 3D adaptive app icon (GI monogram), ALL-NEW 3D Nebula Green UI with entrance animations, ripple touch, elevation shadows. Sensors, GPS, camera, audio + video engines (GIF maker, video tools), QR + barcode engine, PDF engine, network suite (30+ tools), App Lock, File Checksum, bundled Padauk Burmese fonts (SIL OFL). Works on Android 8+ / armeabi-v7a (Redmi 9A). POWERED BY I KO KO'
           files: GIToolbox-v3.0.apk
           make_latest: true

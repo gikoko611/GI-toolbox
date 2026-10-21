@@ -25,7 +25,7 @@ public class AllToolsActivity extends Activity {
                 finish();
             }
         }));
-        search = Ui.input(this, "Search 300+ tools...", false);
+        search = Ui.input(this, "Search 325 tools...", false);
         search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int a, int c, int d) {

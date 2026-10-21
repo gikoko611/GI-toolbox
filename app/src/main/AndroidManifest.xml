@@ -11,6 +11,19 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
+    <!-- package visibility (Android 11+): let System Pro scan boot receivers, TTS engines, ringtones -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.BOOT_COMPLETED" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+        <intent>
+            <action android:name="android.app.action.RINGTONE_PICKER" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -50,6 +63,7 @@
         <activity android:name=".PdfToolActivity" android:exported="false" />
         <activity android:name=".AudioToolActivity" android:exported="false" />
         <activity android:name=".VideoToolActivity" android:exported="false" />
+        <activity android:name=".SysActivity" android:exported="false" />
 
         <receiver android:name=".AlarmReceiver" android:exported="false" />
     </application>

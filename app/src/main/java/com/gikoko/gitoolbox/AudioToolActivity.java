@@ -579,7 +579,7 @@ public class AudioToolActivity extends Activity {
                     if (mode.equals("gain")) {
                         int sid = player.getAudioSessionId();
                         booster = new LoudnessEnhancer(sid);
-                        booster.setGain(Math.max(0, Math.min(20, floatOf(val, 10f))) * 100);
+                        booster.setTargetGain(Math.max(0, Math.min(20, floatOf(val, 10f))) * 100);
                         booster.setEnabled(true);
                     } else {
                         float f = floatOf(val, 1.5f);

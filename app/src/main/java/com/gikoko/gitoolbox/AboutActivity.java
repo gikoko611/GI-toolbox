@@ -28,13 +28,13 @@ public class AboutActivity extends Activity {
         gi.setGravity(android.view.Gravity.CENTER);
         c.addView(gi);
         c.addView(Ui.gold(this, "GIToolbox NATIVE", 22));
-        c.addView(Ui.text(this, "ALL-IN-ONE · 300 FEATURES · V2.0", 12, Ui.DIM, false));
+        c.addView(Ui.text(this, "ALL-IN-ONE · 325 FEATURES · V3.0", 12, Ui.DIM, false));
         root.addView(c);
 
         LinearLayout c2 = Ui.card(this);
         c2.addView(Ui.text(this, "100% NATIVE ANDROID ENGINE", 13, Ui.GREEN, true));
         c2.addView(Ui.text(this, "No WebView. Every screen is built with native Android views and Java code — splash, home, search, categories and tools all run on your phone's own engine.", 12, Ui.TEXT, false));
-        c2.addView(Ui.text(this, "Cyber Edition — Green • Gold • Dark", 12, Ui.TEXT, false));
+        c2.addView(Ui.text(this, "Nebula Edition — Green • Gold • Dark", 12, Ui.TEXT, false));
         c2.addView(Ui.text(this, "Most tools run fully offline.", 12, Ui.TEXT, false));
         LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);

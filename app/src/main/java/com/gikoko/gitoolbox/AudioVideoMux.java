@@ -65,7 +65,7 @@ public final class AudioVideoMux {
         }
         mux.start();
         ByteBuffer buf = ByteBuffer.allocate(1 << 20);
-        MediaMuxer.BufferInfoShim info = new MediaMuxer.BufferInfoShim();
+        BufferInfoShim info = new BufferInfoShim();
         long written = 0;
         if (startUs > 0) {
             ex.seekTo(startUs, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
@@ -92,13 +92,17 @@ public final class AudioVideoMux {
                 if (pts < 0) pts = 0;
                 info.presentationTimeUs = pts;
                 info.flags = (ex.getSampleFlags() & MediaExtractor.SAMPLE_FLAG_SYNC) != 0
-                        ? android.media.MediaCodec.BufferInfo.FLAG_KEY_FRAME : 0;
+                        ? android.media.MediaCodec.BUFFER_FLAG_KEY_FRAME : 0;
                 mux.writeSampleData(outTrack, buf, info.info());
                 written++;
             }
             ex.advance();
         }
-        mux.stop();
+        try {
+            mux.stop();
+        } catch (Exception e) {
+            // no samples written — release without stopping
+        }
         mux.release();
         ex.release();
         return written;
@@ -147,7 +151,7 @@ public final class AudioVideoMux {
         int trackOut = mux.addTrack(fA);
         mux.start();
         ByteBuffer buf = ByteBuffer.allocate(1 << 20);
-        MediaMuxer.BufferInfoShim info = new MediaMuxer.BufferInfoShim();
+        BufferInfoShim info = new BufferInfoShim();
         long offset = 0;
         // file A
         while (true) {
@@ -157,7 +161,7 @@ public final class AudioVideoMux {
             info.size = size;
             info.presentationTimeUs = exA.getSampleTime() + offset;
             info.flags = (exA.getSampleFlags() & MediaExtractor.SAMPLE_FLAG_SYNC) != 0
-                    ? android.media.MediaCodec.BufferInfo.FLAG_KEY_FRAME : 0;
+                    ? android.media.MediaCodec.BUFFER_FLAG_KEY_FRAME : 0;
             mux.writeSampleData(trackOut, buf, info.info());
             exA.advance();
         }
@@ -170,11 +174,15 @@ public final class AudioVideoMux {
             info.size = size;
             info.presentationTimeUs = exB.getSampleTime() + offset;
             info.flags = (exB.getSampleFlags() & MediaExtractor.SAMPLE_FLAG_SYNC) != 0
-                    ? android.media.MediaCodec.BufferInfo.FLAG_KEY_FRAME : 0;
+                    ? android.media.MediaCodec.BUFFER_FLAG_KEY_FRAME : 0;
             mux.writeSampleData(trackOut, buf, info.info());
             exB.advance();
         }
-        mux.stop();
+        try {
+            mux.stop();
+        } catch (Exception e) {
+            // no samples written — release without stopping
+        }
         mux.release();
         exA.release();
         exB.release();
