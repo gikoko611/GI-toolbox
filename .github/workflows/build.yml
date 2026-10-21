@@ -50,19 +50,19 @@ jobs:
 
       - name: Rename APK
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk GIToolbox-v0.0.1.apk
+          cp app/build/outputs/apk/debug/app-debug.apk GIToolbox-v0.0.2.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GIToolbox-v0.0.1-APK
+          name: GIToolbox-v0.0.2-APK
           path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Release APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.0.1
-          name: GIToolbox v0.0.1
-          body: 'GIToolbox v0.0.1 "CYBER 3D" — FULL NATIVE Android app (no WebView). 350 tools across 14 categories incl. the all-new WiFi & Comm suite: WiFi Call, Walkie-Talkie, LAN Phone Control, Find My Phone, CCTV Camera (motion-detect + live browser view), LAN Chat, Clipboard Sync. NEW: Myanmar Calendar (lunar/M.E. engine), Myanmar Numerals, Text to Speech, Morse Flasher (torch), Sound/Tone/Ultrasonic Generator, Hearing Test, White Noise, Decibel Alarm, Stop Motion Studio (GIF export), Bluetooth/NFC checkers, WiFi Signal Meter, Flashlight SOS. ALL-NEW modern cyber 3D flash theme with per-tool procedurally-drawn 3D icons, neon cyan/magenta surfaces, entrance animations, ripple touch, elevation. Bundled Padauk Burmese fonts (SIL OFL). Works on Android 8+ / armeabi-v7a (Redmi 9A). POWERED BY I KO KO'
-          files: GIToolbox-v0.0.1.apk
+          tag_name: v0.0.2
+          name: GIToolbox v0.0.2
+          body: 'GIToolbox v0.0.2 "CYBER 3D" — FULL NATIVE Android app (no WebView). 350 tools across 14 categories incl. the all-new WiFi & Comm suite: WiFi Call, Walkie-Talkie, LAN Phone Control, Find My Phone, CCTV Camera (motion-detect + live browser view), LAN Chat, Clipboard Sync. NEW: Myanmar Calendar (lunar/M.E. engine), Myanmar Numerals, Text to Speech, Morse Flasher (torch), Sound/Tone/Ultrasonic Generator, Hearing Test, White Noise, Decibel Alarm, Stop Motion Studio (GIF export), Bluetooth/NFC checkers, WiFi Signal Meter, Flashlight SOS. ALL-NEW modern cyber 3D flash theme with per-tool procedurally-drawn 3D icons, neon cyan/magenta surfaces, entrance animations, ripple touch, elevation. v0.0.2 FIX: category grid columns now always fit the screen (before, half the categories could be clipped off-screen on narrow phones), home shows a live badge with the real loaded counts, All-Tools list uses much less memory, and all tool/category counts are computed live from the catalog. Bundled Padauk Burmese fonts (SIL OFL). Works on Android 8+ / armeabi-v7a (Redmi 9A). POWERED BY I KO KO'
+          files: GIToolbox-v0.0.2.apk
           make_latest: true

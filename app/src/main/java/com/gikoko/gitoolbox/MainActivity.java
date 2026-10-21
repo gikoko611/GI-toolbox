@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-/** Splash + home (search + 12 category grid) + all tools + about. 100% native, no WebView. */
+/** Splash + home (search + category grid) + all tools + about. 100% native, no WebView. */
 public class MainActivity extends Activity {
 
     private int page = 0; // 0 home, 1 all, 2 about
@@ -111,7 +111,7 @@ public class MainActivity extends Activity {
         Ui.reveal(name, 200);
         Ui.flash(name);
 
-        TextView ver = Ui.badge(this, "v0.0.1 · CYBER 3D", Ui.CYAN);
+        TextView ver = Ui.badge(this, "v0.0.2 · CYBER 3D", Ui.CYAN);
         ver.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams vlp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -176,15 +176,15 @@ public class MainActivity extends Activity {
         hlp.leftMargin = Ui.dp(this, 10);
         ht.setLayoutParams(hlp);
         ht.addView(Ui.gold(this, "GIToolbox", 20));
-        ht.addView(Ui.text(this, "350 FEATURES · CYBER v0.0.1", 11, Ui.DIM, false));
+        ht.addView(Ui.text(this, (Catalog.CATS.length * 25) + " FEATURES · CYBER v0.0.2", 11, Ui.DIM, false));
         head.addView(ht);
-        TextView ver = Ui.text(this, "v0.0.1", 11, Ui.GOLD, true);
+        TextView ver = Ui.text(this, "v0.0.2", 11, Ui.GOLD, true);
         head.addView(ver);
         root.addView(head);
         Ui.reveal(head);
 
         // search
-        search = Ui.input(this, "Search 350 tools...", false);
+        search = Ui.input(this, "Search " + (Catalog.CATS.length * 25) + " tools...", false);
         search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int a, int c, int d) {
@@ -217,7 +217,7 @@ public class MainActivity extends Activity {
         TextView bTitle = Ui.gold(this, "⚡ ALL-IN-ONE TOOLBOX", 13);
         bTitle.setLayoutParams(btlp);
         bTop.addView(bTitle);
-        bTop.addView(Ui.badge(this, "● 350 TOOLS LIVE", Ui.GREEN));
+        bTop.addView(Ui.badge(this, "● " + (Catalog.CATS.length * 25) + " TOOLS LIVE", Ui.GREEN));
         banner.addView(bTop);
         TextView b2 = Ui.text(this, "Cyber 3D Edition · POWERED BY I KO KO", 10, Ui.TEXT, false);
         b2.setPadding(0, Ui.dp(this, 4), 0, 0);
@@ -266,13 +266,28 @@ public class MainActivity extends Activity {
             c.addView(top);
             GridLayout.LayoutParams glp = new GridLayout.LayoutParams();
             glp.columnSpec = GridLayout.spec(i % 2, 1, 1f);
-            glp.width = GridLayout.LayoutParams.WRAP_CONTENT;
+            // width 0 + column weight = two equal columns that always fit
+            // the screen (WRAP_CONTENT made the right column clip off-screen
+            // on 360dp phones, hiding half the categories). v0.0.2 fix.
+            glp.width = 0;
             glp.topMargin = Ui.dp(this, 8);
             c.setLayoutParams(glp);
             grid.addView(c);
             Ui.reveal(c, 120 + i * 60L);
         }
         root.addView(grid);
+
+        // live data check: proof the catalog is fully loaded
+        LinearLayout proof = Ui.row(this);
+        proof.setGravity(Gravity.CENTER);
+        proof.addView(Ui.badge(this,
+                "● " + Catalog.CATS.length + " CATEGORIES · " + (Catalog.CATS.length * 25) + " TOOLS LOADED",
+                Ui.CYAN));
+        LinearLayout.LayoutParams plp2 = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        plp2.topMargin = Ui.dp(this, 12);
+        proof.setLayoutParams(plp2);
+        root.addView(proof);
 
         // bottom nav
         LinearLayout nav = Ui.row(this);

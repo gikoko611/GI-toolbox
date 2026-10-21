@@ -28,7 +28,7 @@ public class AboutActivity extends Activity {
         gi.setGravity(android.view.Gravity.CENTER);
         c.addView(gi);
         c.addView(Ui.gold(this, "GIToolbox NATIVE", 22));
-        c.addView(Ui.text(this, "ALL-IN-ONE · 350 FEATURES · v0.0.1 CYBER", 12, Ui.DIM, false));
+        c.addView(Ui.text(this, "ALL-IN-ONE · " + (Catalog.CATS.length * 25) + " FEATURES · v0.0.2 CYBER", 12, Ui.DIM, false));
         root.addView(c);
 
         LinearLayout c2 = Ui.card(this);

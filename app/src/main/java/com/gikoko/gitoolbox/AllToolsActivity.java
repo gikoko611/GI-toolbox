@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-/** All 350 tools with live search — each tool with its own 3D icon. */
+/** All 350 tools with live search — each row with a 3D category icon. */
 public class AllToolsActivity extends Activity {
 
     private LinearLayout list;
@@ -28,10 +28,10 @@ public class AllToolsActivity extends Activity {
             }
         }));
         LinearLayout br = Ui.row(this);
-        br.addView(Ui.badge(this, "● 350 CYBER TOOLS", Ui.CYAN));
+        br.addView(Ui.badge(this, "● " + (Catalog.CATS.length * 25) + " CYBER TOOLS", Ui.CYAN));
         root.addView(br);
         Ui.reveal(br);
-        search = Ui.input(this, "Search 350 tools...", false);
+        search = Ui.input(this, "Search " + (Catalog.CATS.length * 25) + " tools...", false);
         search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int a, int c, int d) {
@@ -60,6 +60,9 @@ public class AllToolsActivity extends Activity {
         int shown = 0;
         for (int c = 0; c < Catalog.CATS.length; c++) {
             boolean catShown = false;
+            // one shared icon per category: 14 bitmaps instead of 350 (no OOM
+            // on low-RAM phones, list still gets a 3D icon on every row)
+            android.graphics.drawable.Drawable catIcon = Icon3D.tile(this, Catalog.CATS[c][0], c);
             for (int t = 0; t < 25; t++) {
                 final String name = Catalog.tool(c, t);
                 if (needle.length() >= 1 && !name.toLowerCase().contains(needle)) continue;
@@ -80,7 +83,7 @@ public class AllToolsActivity extends Activity {
                 LinearLayout top = Ui.row(this);
                 top.setGravity(Gravity.CENTER_VERTICAL);
                 ImageView icon = new ImageView(this);
-                icon.setImageDrawable(Icon3D.tile(this, name, cI));
+                icon.setImageDrawable(catIcon);
                 LinearLayout.LayoutParams ilp = new LinearLayout.LayoutParams(
                         Ui.dp(this, 40), Ui.dp(this, 40));
                 icon.setLayoutParams(ilp);
