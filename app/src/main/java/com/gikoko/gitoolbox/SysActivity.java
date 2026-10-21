@@ -3,6 +3,7 @@ package com.gikoko.gitoolbox;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ClipData;
+import android.content.ComponentName;
 import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -789,7 +790,8 @@ public class SysActivity extends Activity {
                             boolean enabled = true;
                             try {
                                 enabled = getPackageManager().getComponentEnabledSetting(
-                                        ri.activityInfo) != PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+                                        new ComponentName(ri.activityInfo.packageName, ri.activityInfo.name))
+                                        != PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
                             } catch (Exception ignored) {
                             }
                             final String fpkg = pkg;
@@ -1126,15 +1128,15 @@ public class SysActivity extends Activity {
         out.addView(card("SYSTEM STREAMS", "Drag a slider to set each stream's volume instantly.", Ui.TEXT));
         try {
             AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
-            int[][] streams = {
+            Object[][] streams = {
                     {AudioManager.STREAM_MUSIC, "🎵 MEDIA"},
                     {AudioManager.STREAM_RING, "📳 RING"},
                     {AudioManager.STREAM_ALARM, "⏰ ALARM"},
                     {AudioManager.STREAM_NOTIFICATION, "🔔 NOTIFICATIONS"},
                     {AudioManager.STREAM_SYSTEM, "🖥 SYSTEM"},
             };
-            for (int[] s : streams) {
-                final int stream = s[0];
+            for (Object[] s : streams) {
+                final int stream = (Integer) s[0];
                 int max = 0;
                 try {
                     max = am.getStreamMaxVolume(stream);
