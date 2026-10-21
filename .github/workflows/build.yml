@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   build:
@@ -26,7 +27,20 @@ jobs:
           gradle-version: '8.7'
 
       - name: Build debug APK
-        run: gradle assembleDebug --no-daemon
+        run: |
+          set -o pipefail
+          gradle assembleDebug --no-daemon 2>&1 | tee build.log
+
+      - name: Report build errors as issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tail -n 200 build.log > report.txt
+          gh issue create --repo "$GITHUB_REPOSITORY" \
+            --title "Build failed $(git rev-parse --short HEAD)" \
+            --body-file report.txt \
+            --label "build-failure" || true
 
       - name: Rename APK
         run: |
