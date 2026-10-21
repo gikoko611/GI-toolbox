@@ -30,19 +30,19 @@ jobs:
 
       - name: Rename APK
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk GIToolbox-v1.1.apk
+          cp app/build/outputs/apk/debug/app-debug.apk GIToolbox-v2.0.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GIToolbox-v1.1-APK
+          name: GIToolbox-v2.0-APK
           path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Release APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.1
-          name: GIToolbox v1.1
-          body: 'GIToolbox v1.1 - 300-tool cyber suite + NATIVE MODULES: flashlight, camera, GPS, sensors, battery, sound meter, vibration. POWERED BY I KO KO'
-          files: GIToolbox-v1.1.apk
+          tag_name: v2.0
+          name: GIToolbox v2.0
+          body: 'GIToolbox v2.0 - FULL NATIVE Android app (no WebView). 300 tools, 12 categories, native UI, sensors, camera, GPS, audio recorder, QR engine, PDF engine, network tools. Works on Android 8+ / armeabi-v7a (Redmi 9A). POWERED BY I KO KO'
+          files: GIToolbox-v2.0.apk
           make_latest: true

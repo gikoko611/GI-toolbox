@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
     <application
         android:allowBackup="true"
@@ -25,5 +27,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".AllToolsActivity" android:exported="false" />
+        <activity android:name=".CategoryActivity" android:exported="false" />
+        <activity android:name=".ToolActivity" android:exported="false" />
+        <activity android:name=".PanelActivity" android:exported="false" />
+        <activity android:name=".AboutActivity" android:exported="false" />
+        <activity android:name=".InfoActivity" android:exported="false" />
+        <activity android:name=".SensorActivity" android:exported="false" />
+        <activity android:name=".GpsActivity" android:exported="false" />
+        <activity android:name=".SoundMeterActivity" android:exported="false" />
+        <activity android:name=".HardwareActivity" android:exported="false" />
+        <activity android:name=".ScreenTestActivity" android:exported="false" />
+        <activity android:name=".MeasureActivity" android:exported="false" />
+        <activity android:name=".ClockActivity" android:exported="false" />
+        <activity android:name=".ListToolActivity" android:exported="false" />
+        <activity android:name=".QrActivity" android:exported="false" />
+        <activity android:name=".NetActivity" android:exported="false" />
+        <activity android:name=".ImageToolActivity" android:exported="false" />
+        <activity android:name=".PdfToolActivity" android:exported="false" />
+        <activity android:name=".AudioToolActivity" android:exported="false" />
+
+        <receiver android:name=".AlarmReceiver" android:exported="false" />
     </application>
 </manifest>
