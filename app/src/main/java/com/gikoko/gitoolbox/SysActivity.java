@@ -1519,17 +1519,18 @@ public class SysActivity extends Activity {
         c.addView(st);
         out.addView(c);
         Ui.reveal(c);
-        final android.bluetooth.BluetoothAdapter ba;
+        android.bluetooth.BluetoothAdapter ba0;
         try {
-            ba = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
+            ba0 = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
         } catch (Exception e) {
-            ba = null;
+            ba0 = null;
         }
-        if (ba == null) {
+        if (ba0 == null) {
             st.setText("NO BLUETOOTH — this device has no Bluetooth radio.");
             st.setTextColor(Ui.RED);
             return;
         }
+        final android.bluetooth.BluetoothAdapter ba = ba0;
         String state;
         try {
             state = ba.isEnabled() ? "ON" : "OFF";
