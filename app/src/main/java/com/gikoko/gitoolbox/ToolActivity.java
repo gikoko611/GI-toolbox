@@ -67,7 +67,7 @@ public class ToolActivity extends Activity {
         output = new TextView(this);
         output.setTextColor(Ui.TEXT);
         output.setTextSize(13);
-        output.setTypeface(android.graphics.Typeface.MONOSPACE);
+        Ui.applyTypeface(output, false, this);
         output.setTextIsSelectable(true);
 
         LinearLayout outCard = Ui.card(this);

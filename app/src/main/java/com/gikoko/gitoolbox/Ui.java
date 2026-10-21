@@ -28,6 +28,43 @@ public final class Ui {
     private Ui() {
     }
 
+    // ---------- Padauk font (bundled Burmese font, OFL) ----------
+
+    private static Typeface FONT;
+    private static Typeface FONT_BOLD;
+    private static boolean fontTried = false;
+
+    private static void ensureFonts(Context c) {
+        if (fontTried) return;
+        fontTried = true;
+        try {
+            FONT = Typeface.createFromAsset(c.getAssets(), "fonts/padauk_regular.ttf");
+        } catch (Exception e) {
+            FONT = null;
+        }
+        try {
+            FONT_BOLD = Typeface.createFromAsset(c.getAssets(), "fonts/padauk_bold.ttf");
+        } catch (Exception e) {
+            FONT_BOLD = null;
+        }
+    }
+
+    /** Apply the bundled Burmese font to a view built outside Ui helpers. */
+    public static void applyTypeface(TextView t, boolean bold, Context c) {
+        ensureFonts(c);
+        if (bold) {
+            t.setTypeface(FONT_BOLD != null ? FONT_BOLD : Typeface.DEFAULT_BOLD);
+        } else {
+            t.setTypeface(FONT != null ? FONT : Typeface.DEFAULT);
+        }
+    }
+
+    private static Typeface fontFor(boolean bold, Context c) {
+        ensureFonts(c);
+        if (bold) return FONT_BOLD != null ? FONT_BOLD : Typeface.DEFAULT_BOLD;
+        return FONT != null ? FONT : Typeface.DEFAULT;
+    }
+
     public static int dp(Context c, int v) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v,
                 c.getResources().getDisplayMetrics());
@@ -53,7 +90,7 @@ public final class Ui {
         t.setText(s);
         t.setTextSize(sp);
         t.setTextColor(color);
-        if (bold) t.setTypeface(Typeface.DEFAULT_BOLD);
+        t.setTypeface(fontFor(bold, c));
         return t;
     }
 
@@ -68,7 +105,7 @@ public final class Ui {
         b.setText(label);
         b.setAllCaps(false);
         b.setTextColor(color);
-        b.setTypeface(Typeface.DEFAULT_BOLD);
+        b.setTypeface(fontFor(true, c));
         b.setTextSize(13);
         b.setBackground(roundStroke(Color.parseColor("#0A2218"), Color.parseColor("#235A44"), 10, c));
         b.setPadding(dp(c, 14), dp(c, 12), dp(c, 14), dp(c, 12));
@@ -83,6 +120,7 @@ public final class Ui {
         EditText e = new EditText(c);
         e.setHint(hint);
         e.setHintTextColor(DIM);
+        e.setTypeface(fontFor(false, c));
         e.setTextColor(TEXT);
         e.setTextSize(14);
         e.setBackground(roundStroke(Color.parseColor("#071B12"), Color.parseColor("#1E4B38"), 10, c));

@@ -15,6 +15,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Bundle Burmese fonts (Padauk, SIL OFL)
+        run: |
+          mkdir -p app/src/main/assets/fonts
+          curl -fL --retry 3 -o app/src/main/assets/fonts/padauk_regular.ttf \
+            https://raw.githubusercontent.com/google/fonts/main/ofl/padauk/Padauk-Regular.ttf
+          curl -fL --retry 3 -o app/src/main/assets/fonts/padauk_bold.ttf \
+            https://raw.githubusercontent.com/google/fonts/main/ofl/padauk/Padauk-Bold.ttf
+          ls -l app/src/main/assets/fonts
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -41,19 +50,19 @@ jobs:
 
       - name: Rename APK
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk GIToolbox-v2.0.apk
+          cp app/build/outputs/apk/debug/app-debug.apk GIToolbox-v2.1.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GIToolbox-v2.0-APK
+          name: GIToolbox-v2.1-APK
           path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Release APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0
-          name: GIToolbox v2.0
-          body: 'GIToolbox v2.0 - FULL NATIVE Android app (no WebView). 300 tools, 12 categories, native UI, sensors, camera, GPS, audio recorder, QR engine, PDF engine, network tools. Works on Android 8+ / armeabi-v7a (Redmi 9A). POWERED BY I KO KO'
-          files: GIToolbox-v2.0.apk
+          tag_name: v2.1
+          name: GIToolbox v2.1
+          body: 'GIToolbox v2.1 - FULL NATIVE Android app (no WebView). 300 tools, 12 categories, native UI, sensors, camera, GPS, audio recorder, QR engine, PDF engine, network tools, bundled Padauk Burmese fonts (SIL OFL). Works on Android 8+ / armeabi-v7a (Redmi 9A). POWERED BY I KO KO'
+          files: GIToolbox-v2.1.apk
           make_latest: true
